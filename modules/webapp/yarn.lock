@@ -886,12 +886,12 @@
   resolved "https://registry.yarnpkg.com/@fortawesome/vue-fontawesome/-/vue-fontawesome-2.0.0.tgz#63da3e459147cebb0a8d58eed81d6071db9f5973"
   integrity sha512-N3VKw7KzRfOm8hShUVldpinlm13HpvLBQgT63QS+aCrIRLwjoEUXY5Rcmttbfb6HkzZaeqjLqd/aZCQ53UjQpg==
 
-"@glossa-glo/ast@^2.0.1-beta":
-  version "2.0.1-beta"
-  resolved "https://registry.yarnpkg.com/@glossa-glo/ast/-/ast-2.0.1-beta.tgz#c7a5163afdf810fa23f6283a5857abcc9fada2d3"
-  integrity sha512-Y3USmKvSg5E6JIFAvA41Coz4w/9GOmAvZ7Rvb9bQZ58inHtGtoJcvLW8qcddgsVmJ1bp+2Z6qKff5ClPUniVyw==
+"@glossa-glo/ast@^3.0.0-beta":
+  version "3.0.0-beta"
+  resolved "https://registry.yarnpkg.com/@glossa-glo/ast/-/ast-3.0.0-beta.tgz#1a55dc7f6c5c2618461aac3a6f1dbd5c89f7eb77"
+  integrity sha512-4ojF5ApAEvSiotFncLsgGRpFf2i8efMlw9+yzfdzFh8VwCEvmH3S8J1sDYmoa7ZuOnjAhSUYvBCpXn1GSjsPkg==
   dependencies:
-    "@glossa-glo/data-types" "^2.0.0-beta"
+    "@glossa-glo/data-types" "^3.0.0-beta"
     "@glossa-glo/error" "^1.0.2-beta"
 
 "@glossa-glo/case-insensitive-map@^1.4.0-beta":
@@ -899,10 +899,10 @@
   resolved "https://registry.yarnpkg.com/@glossa-glo/case-insensitive-map/-/case-insensitive-map-1.4.0-beta.tgz#c94f71358cb1423d63debd44a77bd006ceb0b6a5"
   integrity sha512-FZSTPSEOC7ujm1KHyXCXw9L4MqMa6jsAx2Wbu7ZJyGGlsHcpO0YAMqtu500y7WdAROZNELZ54vyTk4V8X9+j9A==
 
-"@glossa-glo/data-types@^2.0.0-beta":
-  version "2.0.0-beta"
-  resolved "https://registry.yarnpkg.com/@glossa-glo/data-types/-/data-types-2.0.0-beta.tgz#8aaf63ab50ea5006317b11dd89aa27c68e02264a"
-  integrity sha512-rtMW9Wy56n4LwBsZu6YQ8jHn5FZzfRkNf2syW0jIIQXGNF81Ei19mkO7KZRtvVta5q9fsptNXEi5yKLAi9pFLw==
+"@glossa-glo/data-types@^3.0.0-beta":
+  version "3.0.0-beta"
+  resolved "https://registry.yarnpkg.com/@glossa-glo/data-types/-/data-types-3.0.0-beta.tgz#94e17fb5c55a9d11a412bb72e23c88a4080b8447"
+  integrity sha512-pPlGrsxiLA3PlKzmzPtuegZNHRpec9sEvQXJyAQHIP+YxYHNbN1EJSuORyxw/fPdbfwgtaAv/vwoinY7uof2WA==
   dependencies:
     "@glossa-glo/error" "^1.0.2-beta"
 
@@ -913,79 +913,79 @@
   dependencies:
     deep-equal "^2.0.3"
 
-"@glossa-glo/glo@^2.0.1-beta":
-  version "2.0.1-beta"
-  resolved "https://registry.yarnpkg.com/@glossa-glo/glo/-/glo-2.0.1-beta.tgz#1acc22b0e75dd3a6fe9965fa84275fd2bc88167d"
-  integrity sha512-pPZJwmvUYEQQwepy/qKCvL6aBWJG6r29wljT7BEbaZ9e/ApJzaCkMDZE9CKG5sARKfzeWB3YUN60nnArAC8/tA==
+"@glossa-glo/glo@^3.0.3-beta":
+  version "3.0.3-beta"
+  resolved "https://registry.yarnpkg.com/@glossa-glo/glo/-/glo-3.0.3-beta.tgz#37c725171b8e2e1ef7c0e6796e0048a6b6137b91"
+  integrity sha512-uxU0EE7Wb/gq6TmxHoVSTDTXpKS1CqoQADS28exSq9pzr1R/DOj7FWjTeuj5gcB+rbdP64bjGg7mgUj4QHm/Tg==
   dependencies:
-    "@glossa-glo/ast" "^2.0.1-beta"
+    "@glossa-glo/ast" "^3.0.0-beta"
     "@glossa-glo/error" "^1.0.2-beta"
-    "@glossa-glo/interpreter" "^2.0.1-beta"
-    "@glossa-glo/lexer" "^2.0.0-beta"
-    "@glossa-glo/library" "^2.0.1-beta"
-    "@glossa-glo/parser" "^2.0.1-beta"
-    "@glossa-glo/semantic-analyzer" "^2.0.1-beta"
-    "@glossa-glo/symbol" "^2.0.1-beta"
+    "@glossa-glo/interpreter" "^3.0.3-beta"
+    "@glossa-glo/lexer" "^3.0.0-beta"
+    "@glossa-glo/library" "^3.0.0-beta"
+    "@glossa-glo/parser" "^3.0.2-beta"
+    "@glossa-glo/semantic-analyzer" "^3.0.2-beta"
+    "@glossa-glo/symbol" "^3.0.0-beta"
 
-"@glossa-glo/interpreter@^2.0.1-beta":
-  version "2.0.1-beta"
-  resolved "https://registry.yarnpkg.com/@glossa-glo/interpreter/-/interpreter-2.0.1-beta.tgz#bbdda9487aa607e7ec0bea2762b88ad03bc95c4c"
-  integrity sha512-94htvQdjKNpd1Pvk8xegU7/ejkSvSUsFCRVUIE3Ghqa/kLmnqLBL7PkwK7oHOKvwtSLSk44bgOBJcA2j95JyDA==
+"@glossa-glo/interpreter@^3.0.3-beta":
+  version "3.0.3-beta"
+  resolved "https://registry.yarnpkg.com/@glossa-glo/interpreter/-/interpreter-3.0.3-beta.tgz#b34bade547e717b60e13587abf15845b9ffd5339"
+  integrity sha512-W3Mob563kTiLHndGA9jQBOR9P/5YlJjQbTwQtpfKsa46U++oP7niu23fSq4KfkiADNyqIXZzC8z3emO4PY57lg==
   dependencies:
-    "@glossa-glo/ast" "^2.0.1-beta"
+    "@glossa-glo/ast" "^3.0.0-beta"
     "@glossa-glo/case-insensitive-map" "^1.4.0-beta"
-    "@glossa-glo/data-types" "^2.0.0-beta"
+    "@glossa-glo/data-types" "^3.0.0-beta"
     "@glossa-glo/error" "^1.0.2-beta"
-    "@glossa-glo/symbol" "^2.0.1-beta"
+    "@glossa-glo/symbol" "^3.0.0-beta"
     clone-deep "^4.0.1"
 
-"@glossa-glo/lexer@^2.0.0-beta":
-  version "2.0.0-beta"
-  resolved "https://registry.yarnpkg.com/@glossa-glo/lexer/-/lexer-2.0.0-beta.tgz#c99b2ee343ad4611bdd04baf621ad66bb20776db"
-  integrity sha512-EhLcpb5GovwfAVSTEo5+ggbstVobI5xi+Z+39mZq4la7O4oIrW80yIUSPSNF3MlKoS86oQhe79Jrk0DTJwK9Vg==
+"@glossa-glo/lexer@^3.0.0-beta":
+  version "3.0.0-beta"
+  resolved "https://registry.yarnpkg.com/@glossa-glo/lexer/-/lexer-3.0.0-beta.tgz#d847c5e6df7a6ccd384c681ec4d8ff1e996a2ba4"
+  integrity sha512-XOaBBjejKGeamXA/JodTYaglcyGhs5FvWFkRL9AYfXaug5vnnV0U5mFc7Pe0YXwaKa5YYZQ8oV7MoYlEIW36xw==
   dependencies:
     "@glossa-glo/case-insensitive-map" "^1.4.0-beta"
-    "@glossa-glo/data-types" "^2.0.0-beta"
+    "@glossa-glo/data-types" "^3.0.0-beta"
     "@glossa-glo/error" "^1.0.2-beta"
 
-"@glossa-glo/library@^2.0.1-beta":
-  version "2.0.1-beta"
-  resolved "https://registry.yarnpkg.com/@glossa-glo/library/-/library-2.0.1-beta.tgz#2367adb68ec87e0ae04c9449b0ec6f29f07d011c"
-  integrity sha512-GVOpZ/BR7BM4jKTHXuHsFMspsubbVIm5eTJVjBVYEEkJPktqBOn0rV4B2FimBbgeAs39wvJkCTSeCQefRLn2WQ==
+"@glossa-glo/library@^3.0.0-beta":
+  version "3.0.0-beta"
+  resolved "https://registry.yarnpkg.com/@glossa-glo/library/-/library-3.0.0-beta.tgz#971462e0be1e27e14547f34dc01a0a777c3ad270"
+  integrity sha512-2r7ZYZM6jpl4wV6vGoMWF120I8cxP6lT96IdINpynBkU+Jda5KK3w2cxFFmvFtf/7zXJRqsaZkxN1/zTM6SQQA==
   dependencies:
-    "@glossa-glo/data-types" "^2.0.0-beta"
+    "@glossa-glo/data-types" "^3.0.0-beta"
     "@glossa-glo/error" "^1.0.2-beta"
-    "@glossa-glo/symbol" "^2.0.1-beta"
+    "@glossa-glo/symbol" "^3.0.0-beta"
 
-"@glossa-glo/parser@^2.0.1-beta":
-  version "2.0.1-beta"
-  resolved "https://registry.yarnpkg.com/@glossa-glo/parser/-/parser-2.0.1-beta.tgz#f0acd8bc5a65d107e0bf10c89b1ef0e09fcfe592"
-  integrity sha512-ZTrjvcaSP9hhvVlb5csoBMhqQZPuhqSwWT0I5HSQnzFx17IuwcdHzvncHmrzAN2iDy5sS2Z9+237nbGBFD05lA==
+"@glossa-glo/parser@^3.0.2-beta":
+  version "3.0.2-beta"
+  resolved "https://registry.yarnpkg.com/@glossa-glo/parser/-/parser-3.0.2-beta.tgz#efe9fafe87bbde32b06ca71d529510c52fb4b266"
+  integrity sha512-erlKeowD9psEe8Q85drpz+K4TtUK4ywWi1hf1OWVFODibLUMvwv9Xr3U+wokzIVtV4dijZJXBqSJZnKNwy4JYA==
   dependencies:
-    "@glossa-glo/ast" "^2.0.1-beta"
-    "@glossa-glo/data-types" "^2.0.0-beta"
+    "@glossa-glo/ast" "^3.0.0-beta"
+    "@glossa-glo/data-types" "^3.0.0-beta"
     "@glossa-glo/error" "^1.0.2-beta"
-    "@glossa-glo/lexer" "^2.0.0-beta"
+    "@glossa-glo/lexer" "^3.0.0-beta"
 
-"@glossa-glo/semantic-analyzer@^2.0.1-beta":
-  version "2.0.1-beta"
-  resolved "https://registry.yarnpkg.com/@glossa-glo/semantic-analyzer/-/semantic-analyzer-2.0.1-beta.tgz#111871b24449ccb090cecb8d8845cb6d3c75566c"
-  integrity sha512-5SVDxsU+HPMa0lG11YuTS75mBeOxDvmLl/MMwvgJCYzJJ3vGpI9NxoTJq6tbVRR/QfngINFyx67S2wONLMd20w==
+"@glossa-glo/semantic-analyzer@^3.0.2-beta":
+  version "3.0.2-beta"
+  resolved "https://registry.yarnpkg.com/@glossa-glo/semantic-analyzer/-/semantic-analyzer-3.0.2-beta.tgz#de3aa0d599ef8ec16cb036d52e4090e62a86fb32"
+  integrity sha512-1inqmWB5Y2lFGAPn1JQJrw7PTUVXmTl0AQndJAeYpQv5RrTalSFUEaAQmV/8MNXZCORJW0J4CjcWkxN7PRFzOA==
   dependencies:
-    "@glossa-glo/ast" "^2.0.1-beta"
+    "@glossa-glo/ast" "^3.0.0-beta"
     "@glossa-glo/case-insensitive-map" "^1.4.0-beta"
-    "@glossa-glo/data-types" "^2.0.0-beta"
+    "@glossa-glo/data-types" "^3.0.0-beta"
     "@glossa-glo/error" "^1.0.2-beta"
-    "@glossa-glo/symbol" "^2.0.1-beta"
+    "@glossa-glo/symbol" "^3.0.0-beta"
 
-"@glossa-glo/symbol@^2.0.1-beta":
-  version "2.0.1-beta"
-  resolved "https://registry.yarnpkg.com/@glossa-glo/symbol/-/symbol-2.0.1-beta.tgz#2b4fc8903b33da98d236e1754307aa90fbacf9f8"
-  integrity sha512-gpCyh7Vsh7mOaUQlL9fxNdBErrA7h9ZMmPwbsPUlCALZDZ1Zoacms7fT8SvkNMT2qImxbI6DYQPRO/0/IQNaxw==
+"@glossa-glo/symbol@^3.0.0-beta":
+  version "3.0.0-beta"
+  resolved "https://registry.yarnpkg.com/@glossa-glo/symbol/-/symbol-3.0.0-beta.tgz#12d8c53505cbc43dae79839d8e6a3d69551bf0ae"
+  integrity sha512-LvEFMl+M6pCjvWkS7jfH/VANGePyqtiulGCIReQhG6hGq2IyRA3HfSPHhtJ1GWPvLsMa3Vk3CCTUNvqdlef/Lg==
   dependencies:
-    "@glossa-glo/ast" "^2.0.1-beta"
+    "@glossa-glo/ast" "^3.0.0-beta"
     "@glossa-glo/case-insensitive-map" "^1.4.0-beta"
-    "@glossa-glo/data-types" "^2.0.0-beta"
+    "@glossa-glo/data-types" "^3.0.0-beta"
     "@glossa-glo/error" "^1.0.2-beta"
 
 "@linusborg/vue-simple-portal@^0.1.4":
@@ -4829,9 +4829,9 @@ inherits@2.0.3:
   integrity sha1-Yzwsg+PaQqUC9SRmAiSA9CCCYd4=
 
 ini@^1.3.5:
-  version "1.3.5"
-  resolved "https://registry.yarnpkg.com/ini/-/ini-1.3.5.tgz#eee25f56db1c9ec6085e0c22778083f596abf927"
-  integrity sha512-RZY5huIKCMRWDUqZlEi72f/lmXKMvuszcMBduliQ3nnWbx9X/ZBQO7DijMEYS9EhHBb2qacRUMtC7svLwe0lcw==
+  version "1.3.8"
+  resolved "https://registry.yarnpkg.com/ini/-/ini-1.3.8.tgz#a29da425b48806f34767a4efce397269af28432c"
+  integrity sha512-JV/yugV2uzW5iMRSiZAyDtQd+nxtUnjeLt0acNdw98kKLrvuRVyB80tsREOE7yvGVgalhZ6RNXCmEHkUKBKxew==
 
 inquirer@^7.3.0:
   version "7.3.3"
