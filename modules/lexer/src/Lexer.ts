@@ -244,7 +244,27 @@ export class Lexer {
           .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == '\n') {
         this.currentCharacter = this.advance();
+
+        const savedCurrentCharacter = this.currentCharacter;
+        const savedPosition = this.position;
+        const nextToken = this.getNextToken();
+
+        if (nextToken instanceof Token.LineMergeToken) {
+          throw new GLOError(
+            nextToken,
+            'Ο τελεστής & δεν υποστηρίζεται από τον διερμηνευτή',
+          );
+        }
+
+        this.currentCharacter = savedCurrentCharacter;
+        this.position = savedPosition;
+
         return new Token.NewLineToken()
+          .inheritStartPositionFrom(this.getPositionMinus(1))
+          .inheritEndPositionFrom(this);
+      } else if (this.currentCharacter == '&') {
+        this.currentCharacter = this.advance();
+        return new Token.LineMergeToken()
           .inheritStartPositionFrom(this.getPositionMinus(1))
           .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == '+') {

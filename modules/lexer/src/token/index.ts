@@ -69,6 +69,7 @@ import SelectToken from './SelectToken';
 import CaseToken from './CaseToken';
 import SelectEndToken from './SelectEndToken';
 import ConstantToken from './ConstantToken';
+import LineMergeToken from './LineMergeToken';
 
 export {
   Token,
@@ -142,4 +143,5 @@ export {
   CaseToken,
   SelectEndToken,
   ConstantToken,
+  LineMergeToken,
 };
