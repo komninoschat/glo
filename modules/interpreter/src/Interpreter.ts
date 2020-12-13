@@ -678,9 +678,7 @@ export class Interpreter extends AST.ASTVisitor<Promise<Types.GLODataType>> {
       const expectedType = variableTypes[i];
       const name = argNames[i];
 
-      console.log('reading arg', (argNode as VariableAST).name);
       const reading = await this.options.read(argNode);
-      console.log('read arg', (argNode as VariableAST).name, reading);
 
       if (expectedType === Types.GLOReal) {
         if (/^[+-]?\d+(\.\d+)*$/.test(reading)) {

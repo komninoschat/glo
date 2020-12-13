@@ -1,6 +1,6 @@
 {
   "name": "@glossa-glo/parser",
-  "version": "3.0.2-beta",
+  "version": "3.0.4-beta",
   "description": "GLO parser",
   "author": "komninoschat <komninoschat@gmail.com>",
   "homepage": "https://github.com/komninoschat/glo#readme",
@@ -32,7 +32,7 @@
     "@glossa-glo/ast": "^3.0.0-beta",
     "@glossa-glo/data-types": "^3.0.0-beta",
     "@glossa-glo/error": "^1.0.2-beta",
-    "@glossa-glo/lexer": "^3.0.0-beta"
+    "@glossa-glo/lexer": "^3.0.4-beta"
   },
   "devDependencies": {
     "@types/chai": "^4.2.0",

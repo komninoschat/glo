@@ -387,7 +387,6 @@ export default class InterpreterPage extends Vue {
               this.highlightRead(debugInfoProvider);
               return new Promise((resolve,reject) => {
                 this.readFunction = (reading: string, rejectPromise = false) => {
-                  console.log('read function called!', reading, rejectPromise)
                   this.clearReadHighlight();
 
                   if(rejectPromise) {
