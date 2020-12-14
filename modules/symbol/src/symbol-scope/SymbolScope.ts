@@ -85,6 +85,18 @@ export default abstract class SymbolScope {
     scope.value.set(name, value);
   }
 
+  public change(name: string, value: GLOSymbol) {
+    const scope = this.findScope(name);
+
+    if (!scope) {
+      throw new Error(
+        `Program error: Could not find the scope containing the symbol with name ${name} (current scope: ${this.name})`,
+      );
+    }
+
+    scope.scope.set(name, value);
+  }
+
   private findScope(name: string): SymbolScope | null {
     const result = this.scope.get(name);
     if (result) {

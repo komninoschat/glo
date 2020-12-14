@@ -1,4 +1,5 @@
 import ConstantAST from './ConstantAST';
+import AST from './AST';
 import * as Types from '@glossa-glo/data-types';
 
 export default class StringConstantAST extends ConstantAST {
@@ -9,4 +10,6 @@ export default class StringConstantAST extends ConstantAST {
     super();
     this.value = value;
   }
+
+  public promote: Map<typeof Types.GLODataType, () => AST> = new Map();
 }
