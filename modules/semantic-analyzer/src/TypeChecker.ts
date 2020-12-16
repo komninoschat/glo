@@ -341,7 +341,7 @@ export default class TypeChecker extends AST.ASTVisitor<
       )}`,
     );
 
-    return left;
+    return Types.GLOReal;
   }
 
   public visitMod(node: AST.ModAST) {
