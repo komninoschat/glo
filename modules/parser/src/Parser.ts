@@ -1020,6 +1020,10 @@ export class Parser {
   }
 
   private variable() {
+    if (!(this.currentToken instanceof Lexer.IdToken)) {
+      throw new GLOError(this.currentToken, 'Περίμενα όνομα μεταβλητής');
+    }
+
     const node = new AST.VariableAST(
       this.currentToken.value,
     ).inheritPositionFrom(this.currentToken);
