@@ -1,12 +1,14 @@
 import { DebugInfoProvider } from '@glossa-glo/error';
 import { GLODataType } from '@glossa-glo/data-types';
 
-export default abstract class AST extends DebugInfoProvider {
+interface AST {
+  promote?(target: typeof GLODataType): AST;
+}
+
+abstract class AST extends DebugInfoProvider {
   constructor(..._: any[]) {
     super();
   }
-
-  public promote?: Map<typeof GLODataType, () => AST>;
 
   protected readonly _children: AST[] = [];
   public parent: AST | null = null;
@@ -22,3 +24,5 @@ export default abstract class AST extends DebugInfoProvider {
     });
   }
 }
+
+export default AST;

@@ -10,12 +10,12 @@ export default class IntegerConstantAST extends ConstantAST {
     super();
     this.value = value;
 
-    this.promote.set(Types.GLOReal, () => {
+    this.promoteMap.set(Types.GLOReal, () => {
       return new RealConstantAST(
         this.value.promote!.get(Types.GLOReal)!() as Types.GLOReal,
       );
     });
   }
 
-  public promote: Map<typeof Types.GLODataType, () => AST> = new Map();
+  public promoteMap: Map<typeof Types.GLODataType, () => AST> = new Map();
 }

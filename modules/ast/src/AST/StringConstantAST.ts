@@ -11,5 +11,5 @@ export default class StringConstantAST extends ConstantAST {
     this.value = value;
   }
 
-  public promote: Map<typeof Types.GLODataType, () => AST> = new Map();
+  public promoteMap: Map<typeof Types.GLODataType, () => AST> = new Map();
 }

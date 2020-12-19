@@ -6,5 +6,5 @@ export default class FalseConstantAST extends ConstantAST {
   public readonly value = new GLOBoolean(false);
   dataType = GLOBoolean;
 
-  public promote: Map<typeof GLODataType, () => AST> = new Map();
+  public promoteMap: Map<typeof GLODataType, () => AST> = new Map();
 }

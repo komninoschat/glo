@@ -101,7 +101,7 @@ export default class TypeChecker extends AST.ASTVisitor<
 
         this.currentScope.change(node.left.name, symbol);
       } else {
-        node.left = node.left.promote!.get(promoteLeft)!();
+        node.left = node.left.promote!(promoteLeft);
       }
     }
 
@@ -117,7 +117,7 @@ export default class TypeChecker extends AST.ASTVisitor<
 
         this.currentScope.change(node.right.name, symbol);
       } else {
-        node.right = node.right.promote!.get(promoteRight)!();
+        node.right.promote!(promoteRight);
       }
     }
 
@@ -154,7 +154,7 @@ export default class TypeChecker extends AST.ASTVisitor<
 
         this.currentScope.change(node.left.name, symbol);
       } else {
-        node.left = node.left.promote!.get(promoteLeft)!();
+        node.left = node.left.promote!(promoteLeft);
       }
     }
 
@@ -170,7 +170,7 @@ export default class TypeChecker extends AST.ASTVisitor<
 
         this.currentScope.change(node.right.name, symbol);
       } else {
-        node.right = node.right.promote!.get(promoteRight)!();
+        node.right.promote!(promoteRight);
       }
     }
 
@@ -207,7 +207,7 @@ export default class TypeChecker extends AST.ASTVisitor<
 
         this.currentScope.change(node.left.name, symbol);
       } else {
-        node.left = node.left.promote!.get(promoteLeft)!();
+        node.left = node.left.promote!(promoteLeft);
       }
     }
 
@@ -223,7 +223,7 @@ export default class TypeChecker extends AST.ASTVisitor<
 
         this.currentScope.change(node.right.name, symbol);
       } else {
-        node.right = node.right.promote!.get(promoteRight)!();
+        node.right.promote!(promoteRight);
       }
     }
 
@@ -260,7 +260,7 @@ export default class TypeChecker extends AST.ASTVisitor<
 
         this.currentScope.change(node.left.name, symbol);
       } else {
-        node.left = node.left.promote!.get(promoteLeft)!();
+        node.left = node.left.promote!(promoteLeft);
       }
     }
 
@@ -276,7 +276,7 @@ export default class TypeChecker extends AST.ASTVisitor<
 
         this.currentScope.change(node.right.name, symbol);
       } else {
-        node.right = node.right.promote!.get(promoteRight)!();
+        node.right.promote!(promoteRight);
       }
     }
 
@@ -313,7 +313,7 @@ export default class TypeChecker extends AST.ASTVisitor<
 
         this.currentScope.change(node.left.name, symbol);
       } else {
-        node.left = node.left.promote!.get(promoteLeft)!();
+        node.left = node.left.promote!(promoteLeft);
       }
     }
 
@@ -329,7 +329,7 @@ export default class TypeChecker extends AST.ASTVisitor<
 
         this.currentScope.change(node.right.name, symbol);
       } else {
-        node.right = node.right.promote!.get(promoteRight)!();
+        node.right.promote!(promoteRight);
       }
     }
 
@@ -366,7 +366,7 @@ export default class TypeChecker extends AST.ASTVisitor<
 
         this.currentScope.change(node.left.name, symbol);
       } else {
-        node.left = node.left.promote!.get(promoteLeft)!();
+        node.left = node.left.promote!(promoteLeft);
       }
     }
 
@@ -382,7 +382,7 @@ export default class TypeChecker extends AST.ASTVisitor<
 
         this.currentScope.change(node.right.name, symbol);
       } else {
-        node.right = node.right.promote!.get(promoteRight)!();
+        node.right.promote!(promoteRight);
       }
     }
 
@@ -407,14 +407,36 @@ export default class TypeChecker extends AST.ASTVisitor<
       right,
     });
 
-    if (node.left.promote && promoteLeft && left !== promoteLeft) {
+    if (promoteLeft && left !== promoteLeft) {
       left = promoteLeft;
-      node.left = node.left.promote.get(promoteLeft)!();
+      if (node.left instanceof AST.VariableAST) {
+        const symbol = this.currentScope.resolve(
+          node.left.name,
+          VariableSymbol,
+        )!;
+
+        symbol.type = promoteLeft;
+
+        this.currentScope.change(node.left.name, symbol);
+      } else {
+        node.left = node.left.promote!(promoteLeft);
+      }
     }
 
-    if (node.right.promote && promoteRight && right !== promoteRight) {
+    if (promoteRight && right !== promoteRight) {
       right = promoteRight;
-      node.right = node.right.promote.get(promoteRight)!();
+      if (node.right instanceof AST.VariableAST) {
+        const symbol = this.currentScope.resolve(
+          node.right.name,
+          VariableSymbol,
+        )!;
+
+        symbol.type = promoteRight;
+
+        this.currentScope.change(node.right.name, symbol);
+      } else {
+        node.right.promote!(promoteRight);
+      }
     }
 
     assert(
@@ -450,7 +472,7 @@ export default class TypeChecker extends AST.ASTVisitor<
 
         this.currentScope.change(node.left.name, symbol);
       } else {
-        node.left = node.left.promote!.get(promoteLeft)!();
+        node.left = node.left.promote!(promoteLeft);
       }
     }
 
@@ -466,7 +488,7 @@ export default class TypeChecker extends AST.ASTVisitor<
 
         this.currentScope.change(node.right.name, symbol);
       } else {
-        node.right = node.right.promote!.get(promoteRight)!();
+        node.right.promote!(promoteRight);
       }
     }
 
@@ -502,7 +524,7 @@ export default class TypeChecker extends AST.ASTVisitor<
 
         this.currentScope.change(node.left.name, symbol);
       } else {
-        node.left = node.left.promote!.get(promoteLeft)!();
+        node.left = node.left.promote!(promoteLeft);
       }
     }
 
@@ -518,7 +540,7 @@ export default class TypeChecker extends AST.ASTVisitor<
 
         this.currentScope.change(node.right.name, symbol);
       } else {
-        node.right = node.right.promote!.get(promoteRight)!();
+        node.right.promote!(promoteRight);
       }
     }
 
@@ -554,7 +576,7 @@ export default class TypeChecker extends AST.ASTVisitor<
 
         this.currentScope.change(node.left.name, symbol);
       } else {
-        node.left = node.left.promote!.get(promoteLeft)!();
+        node.left = node.left.promote!(promoteLeft);
       }
     }
 
@@ -570,7 +592,7 @@ export default class TypeChecker extends AST.ASTVisitor<
 
         this.currentScope.change(node.right.name, symbol);
       } else {
-        node.right = node.right.promote!.get(promoteRight)!();
+        node.right.promote!(promoteRight);
       }
     }
 
@@ -606,7 +628,7 @@ export default class TypeChecker extends AST.ASTVisitor<
 
         this.currentScope.change(node.left.name, symbol);
       } else {
-        node.left = node.left.promote!.get(promoteLeft)!();
+        node.left = node.left.promote!(promoteLeft);
       }
     }
 
@@ -622,7 +644,7 @@ export default class TypeChecker extends AST.ASTVisitor<
 
         this.currentScope.change(node.right.name, symbol);
       } else {
-        node.right = node.right.promote!.get(promoteRight)!();
+        node.right.promote!(promoteRight);
       }
     }
 
@@ -658,7 +680,7 @@ export default class TypeChecker extends AST.ASTVisitor<
 
         this.currentScope.change(node.left.name, symbol);
       } else {
-        node.left = node.left.promote!.get(promoteLeft)!();
+        node.left = node.left.promote!(promoteLeft);
       }
     }
 
@@ -674,7 +696,7 @@ export default class TypeChecker extends AST.ASTVisitor<
 
         this.currentScope.change(node.right.name, symbol);
       } else {
-        node.right = node.right.promote!.get(promoteRight)!();
+        node.right.promote!(promoteRight);
       }
     }
 
@@ -710,7 +732,7 @@ export default class TypeChecker extends AST.ASTVisitor<
 
         this.currentScope.change(node.left.name, symbol);
       } else {
-        node.left = node.left.promote!.get(promoteLeft)!();
+        node.left = node.left.promote!(promoteLeft);
       }
     }
 
@@ -726,7 +748,7 @@ export default class TypeChecker extends AST.ASTVisitor<
 
         this.currentScope.change(node.right.name, symbol);
       } else {
-        node.right = node.right.promote!.get(promoteRight)!();
+        node.right.promote!(promoteRight);
       }
     }
 
