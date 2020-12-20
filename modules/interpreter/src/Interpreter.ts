@@ -659,19 +659,6 @@ export class Interpreter extends AST.AsyncASTVisitorWithDefault<
       const arg = node.args[i];
       const value = values[i];
 
-      // const valueType = value.constructor as typeof Types.GLODataType;
-
-      // const name = argNames[i];
-      // const variableType = variableTypes[i];
-
-      // Types.assertTypeEquality({
-      //   node: arg,
-      //   left: variableType,
-      //   right: valueType,
-      //   allowPromoteLeft: false,
-      //   message: `Προσπάθησα να διαβάσω την τιμή '${value.print()}' τύπου RIGHT_TYPE στην μεταβλητή '${name}' μη συμβατού τύπου LEFT_TYPE`,
-      // });
-
       if (arg instanceof AST.VariableAST) {
         this.scope.changeValue(arg.name, value);
       } else {

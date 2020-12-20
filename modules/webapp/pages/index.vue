@@ -122,7 +122,6 @@ symbol-scope-width = 300px
   padding 10px 15px
   border 0
   font-family "Roboto Mono", monospace
-  // box-shadow 0px 0px 5px 0px rgba(65,65,65,0.5)
   border-top 1px solid rgba(65,65,65,0.5)
   line-height 1.25
   position relative
@@ -421,7 +420,6 @@ export default class InterpreterPage extends Vue {
       if (_error instanceof GLOError) {
         let error = _error as GLOError;
         const canEvalLine =
-          // error.start.linePosition === error.end.linePosition &&
           error.start.linePosition !== -1 &&
           error.start.characterPosition !== -1 &&
           error.end.characterPosition !== -1;
