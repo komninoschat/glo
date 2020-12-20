@@ -1,7 +1,7 @@
 import * as Token from './token';
 import CaseInsensitiveMap from '@glossa-glo/case-insensitive-map';
 import * as Types from '@glossa-glo/data-types';
-import GLOError from '@glossa-glo/error';
+import GLOError, { DebugInfoProvider } from '@glossa-glo/error';
 
 export class Lexer {
   public static readonly reservedKeywords = new CaseInsensitiveMap<
@@ -193,16 +193,10 @@ export class Lexer {
   private stringConstant(terminator: string) {
     let str = '';
 
-    const startPosition = {
-      start: {
-        linePosition: this.linePosition,
-        characterPosition: this.characterPosition - 1,
-      },
-      end: {
-        linePosition: this.linePosition,
-        characterPosition: this.characterPosition,
-      },
-    };
+    const startPosition = new DebugInfoProvider([
+      [this.linePosition, this.characterPosition - 1],
+      [this.linePosition, this.characterPosition],
+    ]);
 
     while (this.currentCharacter != terminator) {
       if (this.currentCharacter === '\n' || this.currentCharacter === null) {
@@ -373,13 +367,10 @@ export class Lexer {
         return this.id();
       } else {
         throw new GLOError(
-          {
-            start: this,
-            end: {
-              linePosition: this.linePosition,
-              characterPosition: this.characterPosition + 1,
-            },
-          },
+          new DebugInfoProvider([
+            [this.linePosition, this.characterPosition],
+            [this.linePosition, this.characterPosition + 1],
+          ]),
           `Μη δεκτός χαρακτήρας '${this.currentCharacter}'`,
         );
       }

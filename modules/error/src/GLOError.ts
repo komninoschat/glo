@@ -1,17 +1,6 @@
 import deepEqual from 'deep-equal';
 
-export interface DebugInfoProviderLike {
-  start: {
-    linePosition: number;
-    characterPosition: number;
-  };
-  end: {
-    linePosition: number;
-    characterPosition: number;
-  };
-}
-
-export abstract class DebugInfoProvider implements DebugInfoProviderLike {
+export class DebugInfoProvider {
   start = {
     linePosition: -1,
     characterPosition: -1,
@@ -20,6 +9,15 @@ export abstract class DebugInfoProvider implements DebugInfoProviderLike {
     linePosition: -1,
     characterPosition: -1,
   };
+
+  constructor(info?: [[number, number], [number, number]]) {
+    if (info) {
+      this.start.linePosition = info[0][0];
+      this.start.characterPosition = info[0][1];
+      this.end.linePosition = info[1][0];
+      this.end.characterPosition = info[1][1];
+    }
+  }
 
   public setPosition(line: number, character: number, type: 'start' | 'end') {
     this[type].linePosition = line;
@@ -73,20 +71,20 @@ export enum GLOErrorType {
 export default class GLOError extends DebugInfoProvider {
   message: string;
 
-  start: {
-    linePosition: number;
-    characterPosition: number;
-  };
-  end: {
-    linePosition: number;
-    characterPosition: number;
-  };
-
   constructor(
-    private readonly debugInfoProvider: DebugInfoProviderLike,
+    private readonly debugInfoProvider: DebugInfoProvider,
     message: string,
   ) {
-    super();
+    super([
+      [
+        debugInfoProvider.start.linePosition,
+        debugInfoProvider.start.characterPosition,
+      ],
+      [
+        debugInfoProvider.end.linePosition,
+        debugInfoProvider.end.characterPosition,
+      ],
+    ]);
     this.message = message;
     this.start = debugInfoProvider.start;
     this.end = debugInfoProvider.end;
@@ -94,7 +92,7 @@ export default class GLOError extends DebugInfoProvider {
 }
 
 export function assert(
-  debugInfoProvider: DebugInfoProviderLike,
+  debugInfoProvider: DebugInfoProvider,
   cond: any,
   message: string,
 ) {
@@ -104,7 +102,7 @@ export function assert(
 }
 
 export function assertEquality(
-  debugInfoProvider: DebugInfoProviderLike,
+  debugInfoProvider: DebugInfoProvider,
   obj1: any,
   obj2: any,
   message: string,

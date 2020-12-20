@@ -1,7 +1,7 @@
 import * as Lexer from '@glossa-glo/lexer';
 import * as AST from '@glossa-glo/ast';
 import * as Types from '@glossa-glo/data-types';
-import GLOError from '@glossa-glo/error';
+import GLOError, { DebugInfoProvider } from '@glossa-glo/error';
 
 export class Parser {
   private currentToken: Lexer.Token; // Only change through this.eat
@@ -14,16 +14,16 @@ export class Parser {
   }
 
   get previousTokenEndLocationProvider() {
-    return {
-      start: {
-        linePosition: this.previousToken!.end.linePosition,
-        characterPosition: this.previousToken!.end.characterPosition - 1,
-      },
-      end: {
-        linePosition: this.previousToken!.end.linePosition,
-        characterPosition: this.previousToken!.end.characterPosition,
-      },
-    };
+    return new DebugInfoProvider([
+      [
+        this.previousToken!.end.linePosition,
+        this.previousToken!.end.characterPosition - 1,
+      ],
+      [
+        this.previousToken!.end.linePosition,
+        this.previousToken!.end.characterPosition,
+      ],
+    ]);
   }
 
   private eat(

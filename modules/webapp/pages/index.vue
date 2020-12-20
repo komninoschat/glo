@@ -166,7 +166,7 @@ symbol-scope-width = 300px
 import 'reflect-metadata';
 import { Component, Vue } from 'nuxt-property-decorator';
 import gloInterpret, { Options as GloOptions} from '@glossa-glo/glo';
-import GLOError, { DebugInfoProviderLike } from '@glossa-glo/error';
+import GLOError, { DebugInfoProvider } from '@glossa-glo/error';
 import { ArrayAccessAST, AST, ProgramAST } from '@glossa-glo/ast';
 
 import { CodeMirror, codemirror } from 'vue-codemirror';
@@ -213,7 +213,7 @@ export default class InterpreterPage extends Vue {
     }
   }
 
-  highlightError(debugInfoProvider: DebugInfoProviderLike) {
+  highlightError(debugInfoProvider: DebugInfoProvider) {
     this.clearError();
     const cm = this.$refs.editor.codemirror;
 
@@ -235,7 +235,7 @@ export default class InterpreterPage extends Vue {
     }
   }
 
-  highlightRead(debugInfoProvider: DebugInfoProviderLike) {
+  highlightRead(debugInfoProvider: DebugInfoProvider) {
     this.clearReadHighlight();
     const cm = this.$refs.editor.codemirror;
 
@@ -381,7 +381,7 @@ export default class InterpreterPage extends Vue {
         addMissingTrailingNewline(this.sourceCode),
         {
           ...options,
-          read: (debugInfoProvider: DebugInfoProviderLike) => {
+          read: (debugInfoProvider: DebugInfoProvider) => {
             if(!store.inputFile) {
               this.highlightRead(debugInfoProvider);
               return new Promise((resolve,reject) => {

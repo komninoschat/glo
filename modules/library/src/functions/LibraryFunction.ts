@@ -5,7 +5,7 @@ import {
   SymbolScope,
   VariableSymbol,
 } from '@glossa-glo/symbol';
-import { DebugInfoProviderLike } from '@glossa-glo/error';
+import { DebugInfoProvider } from '@glossa-glo/error';
 
 export default class LibraryFunction {
   private readonly functionSymbol: FunctionSymbol;
@@ -18,7 +18,7 @@ export default class LibraryFunction {
     }[],
     public func: (
       args: GLODataType[],
-      debugInfoProviders: DebugInfoProviderLike[],
+      debugInfoProviders: DebugInfoProvider[],
     ) => GLODataType,
   ) {
     this.functionSymbol = new FunctionSymbol(
