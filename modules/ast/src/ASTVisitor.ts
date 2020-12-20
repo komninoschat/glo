@@ -1,56 +1,56 @@
 import * as AST from './AST';
 import GLOError from '@glossa-glo/error';
 
-interface ASTVisitor<T = unknown> {
-  visitAssignment(node: AST.AssignmentAST): T;
-  visitEmpty(node: AST.EmptyAST): T;
-  visitInteger(node: AST.IntegerAST): T;
-  visitIntegerConstant(node: AST.IntegerConstantAST): T;
-  visitIntegerDivision(node: AST.IntegerDivisionAST): T;
-  visitMinus(node: AST.MinusAST): T;
-  visitMultiplication(node: AST.MultiplicationAST): T;
-  visitPlus(node: AST.PlusAST): T;
-  visitProcedureDeclaration(node: AST.ProcedureDeclarationAST): T;
-  visitProgram(node: AST.ProgramAST): T;
-  visitReal(node: AST.RealAST): T;
-  visitRealConstant(node: AST.RealConstantAST): T;
-  visitRealDivision(node: AST.RealDivisionAST): T;
-  visitUnaryMinus(node: AST.UnaryMinusAST): T;
-  visitUnaryPlus(node: AST.UnaryPlusAST): T;
-  visitVariable(node: AST.VariableAST): T;
-  visitVariableDeclaration(node: AST.VariableDeclarationAST): T;
-  visitMod(node: AST.ModAST): T;
-  visitTrue(node: AST.TrueConstantAST): T;
-  visitFalse(node: AST.FalseConstantAST): T;
-  visitEquals(node: AST.EqualsAST): T;
-  visitNotEquals(node: AST.NotEqualsAST): T;
-  visitGreaterThan(node: AST.GreaterThanAST): T;
-  visitLessThan(node: AST.LessThanAST): T;
-  visitGreaterEquals(node: AST.GreaterEqualsAST): T;
-  visitLessEquals(node: AST.LessEqualsAST): T;
-  visitIf(node: AST.IfAST): T;
-  visitString(node: AST.StringAST): T;
-  visitStringConstant(node: AST.StringConstantAST): T;
-  visitAnd(node: AST.AndAST): T;
-  visitOr(node: AST.OrAST): T;
-  visitNot(node: AST.NotAST): T;
-  visitFunctionCall(node: AST.FunctionCallAST): T;
-  visitProcedureCall(node: AST.ProcedureCallAST): T;
-  visitFor(node: AST.ForAST): T;
-  visitWhile(node: AST.WhileAST): T;
-  visitRepeat(node: AST.RepeatAST): T;
-  visitSubrange(node: AST.SubrangeAST): T;
-  visitBoolean(node: AST.BooleanAST): T;
-  visitArray(node: AST.ArrayAST): T;
-  visitArrayAccess(node: AST.ArrayAccessAST): T;
-  visitFunctionDeclaration(node: AST.FunctionDeclarationAST): T;
-  visitRead(node: AST.ReadAST): T;
-  visitWrite(node: AST.WriteAST): T;
-  visitExponentiation(node: AST.ExponentiationAST): T;
-  visitConstantDeclaration(node: AST.ConstantDeclarationAST): T;
-}
-
 abstract class ASTVisitor<T = unknown> {
+  public abstract visitAssignment(node: AST.AssignmentAST): T;
+  public abstract visitEmpty(node: AST.EmptyAST): T;
+  public abstract visitInteger(node: AST.IntegerAST): T;
+  public abstract visitIntegerConstant(node: AST.IntegerConstantAST): T;
+  public abstract visitIntegerDivision(node: AST.IntegerDivisionAST): T;
+  public abstract visitMinus(node: AST.MinusAST): T;
+  public abstract visitMultiplication(node: AST.MultiplicationAST): T;
+  public abstract visitPlus(node: AST.PlusAST): T;
+  public abstract visitProcedureDeclaration(
+    node: AST.ProcedureDeclarationAST,
+  ): T;
+  public abstract visitProgram(node: AST.ProgramAST): T;
+  public abstract visitReal(node: AST.RealAST): T;
+  public abstract visitRealConstant(node: AST.RealConstantAST): T;
+  public abstract visitRealDivision(node: AST.RealDivisionAST): T;
+  public abstract visitUnaryMinus(node: AST.UnaryMinusAST): T;
+  public abstract visitUnaryPlus(node: AST.UnaryPlusAST): T;
+  public abstract visitVariable(node: AST.VariableAST): T;
+  public abstract visitVariableDeclaration(node: AST.VariableDeclarationAST): T;
+  public abstract visitMod(node: AST.ModAST): T;
+  public abstract visitTrue(node: AST.TrueConstantAST): T;
+  public abstract visitFalse(node: AST.FalseConstantAST): T;
+  public abstract visitEquals(node: AST.EqualsAST): T;
+  public abstract visitNotEquals(node: AST.NotEqualsAST): T;
+  public abstract visitGreaterThan(node: AST.GreaterThanAST): T;
+  public abstract visitLessThan(node: AST.LessThanAST): T;
+  public abstract visitGreaterEquals(node: AST.GreaterEqualsAST): T;
+  public abstract visitLessEquals(node: AST.LessEqualsAST): T;
+  public abstract visitIf(node: AST.IfAST): T;
+  public abstract visitString(node: AST.StringAST): T;
+  public abstract visitStringConstant(node: AST.StringConstantAST): T;
+  public abstract visitAnd(node: AST.AndAST): T;
+  public abstract visitOr(node: AST.OrAST): T;
+  public abstract visitNot(node: AST.NotAST): T;
+  public abstract visitFunctionCall(node: AST.FunctionCallAST): T;
+  public abstract visitProcedureCall(node: AST.ProcedureCallAST): T;
+  public abstract visitFor(node: AST.ForAST): T;
+  public abstract visitWhile(node: AST.WhileAST): T;
+  public abstract visitRepeat(node: AST.RepeatAST): T;
+  public abstract visitSubrange(node: AST.SubrangeAST): T;
+  public abstract visitBoolean(node: AST.BooleanAST): T;
+  public abstract visitArray(node: AST.ArrayAST): T;
+  public abstract visitArrayAccess(node: AST.ArrayAccessAST): T;
+  public abstract visitFunctionDeclaration(node: AST.FunctionDeclarationAST): T;
+  public abstract visitRead(node: AST.ReadAST): T;
+  public abstract visitWrite(node: AST.WriteAST): T;
+  public abstract visitExponentiation(node: AST.ExponentiationAST): T;
+  public abstract visitConstantDeclaration(node: AST.ConstantDeclarationAST): T;
+
   public visit(node: AST.AST): T {
     if (node instanceof AST.AssignmentAST) {
       return this.visitAssignment(node);
@@ -150,6 +150,10 @@ abstract class ASTVisitor<T = unknown> {
         `Program error: Unknown or not implemented AST node type on visitor ${node.constructor.name}`,
       );
     }
+  }
+
+  public visitMultiple(nodes: AST.AST[]): T[] {
+    return nodes.map(this.visit.bind(this));
   }
 }
 

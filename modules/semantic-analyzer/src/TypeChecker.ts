@@ -11,13 +11,9 @@ import {
   SymbolScopeType,
   FunctionOverload,
 } from '@glossa-glo/symbol';
-import GLOError, {
-  assert,
-  assertEquality,
-  DebugInfoProvider,
-} from '@glossa-glo/error';
+import GLOError, { assert, assertEquality } from '@glossa-glo/error';
 
-export default class TypeChecker extends AST.ASTVisitor<
+export default class TypeChecker extends AST.ASTVisitorWithDefault<
   typeof Types.GLODataType
 > {
   private currentScope: SymbolScope;
@@ -855,8 +851,8 @@ export default class TypeChecker extends AST.ASTVisitor<
   public visitProgram(node: AST.ProgramAST) {
     this.currentScope = this.currentScope.children.get(node.name)!;
 
-    node.declarations.forEach(this.visit.bind(this));
-    node.statementList.forEach(this.visit.bind(this));
+    this.visitMultiple(node.declarations);
+    this.visitMultiple(node.statementList);
 
     this.currentScope = this.currentScope.getParent()!;
     return Types.GLOVoid;
@@ -865,42 +861,11 @@ export default class TypeChecker extends AST.ASTVisitor<
   public visitProcedureDeclaration(node: AST.ProcedureDeclarationAST) {
     this.currentScope = this.currentScope.children.get(node.name.name)!;
 
-    node.constantDeclarations.forEach(this.visit.bind(this));
-    node.variableDeclarations.forEach(this.visit.bind(this));
-    node.statementList.forEach(this.visit.bind(this));
+    this.visitMultiple(node.constantDeclarations);
+    this.visitMultiple(node.variableDeclarations);
+    this.visitMultiple(node.statementList);
 
     this.currentScope = this.currentScope.getParent()!;
-    return Types.GLOVoid;
-  }
-
-  public visitIf(node: AST.IfAST) {
-    node.children.forEach(this.visit.bind(this));
-    return Types.GLOVoid;
-  }
-
-  public visitEmpty(node: AST.EmptyAST) {
-    return Types.GLOVoid;
-  }
-
-  public visitInteger(node: AST.IntegerAST) {
-    return Types.GLOVoid;
-  }
-
-  public visitReal(node: AST.RealAST) {
-    return Types.GLOVoid;
-  }
-
-  public visitBoolean(node: AST.BooleanAST) {
-    return Types.GLOVoid;
-  }
-
-  public visitString(node: AST.StringAST) {
-    return Types.GLOVoid;
-  }
-
-  public visitVariableDeclaration(node: AST.VariableDeclarationAST) {
-    this.visit(node.variable);
-    this.visit(node.type);
     return Types.GLOVoid;
   }
 
@@ -1011,7 +976,7 @@ export default class TypeChecker extends AST.ASTVisitor<
       )}, αλλά έλαβα μη συμβατό τύπο ${Types.printType(stepType)}`,
     );
 
-    node.statementList.forEach(node => this.visit(node).bind(this));
+    this.visitMultiple(node.statementList);
     return Types.GLOVoid;
   }
 
@@ -1026,7 +991,7 @@ export default class TypeChecker extends AST.ASTVisitor<
       )}, αλλά έλαβα μη συμβατό τύπο ${Types.printType(conditionType)}`,
     );
 
-    node.statementList.forEach(node => this.visit(node).bind(this));
+    this.visitMultiple(node.statementList);
     return Types.GLOVoid;
   }
 
@@ -1041,21 +1006,7 @@ export default class TypeChecker extends AST.ASTVisitor<
       )}, αλλά έλαβα μη συμβατό τύπο ${Types.printType(conditionType)}`,
     );
 
-    node.statementList.forEach(node => this.visit(node).bind(this));
-    return Types.GLOVoid;
-  }
-
-  public visitSubrange(node: AST.SubrangeAST) {
-    // assert(
-    //   node,
-    //   node.left.lessEqualsThan(node.right),
-    //   'Περίμενα το αριστερό μέλος του εύρους να είναι μικρότερο από το δεξί',
-    // );
-
-    return Types.GLOSubrange;
-  }
-
-  public visitArray(node: AST.ArrayAST) {
+    this.visitMultiple(node.statementList);
     return Types.GLOVoid;
   }
 
@@ -1085,9 +1036,9 @@ export default class TypeChecker extends AST.ASTVisitor<
 
     this.throwOnIOVisit = true;
     this.throwOnIOVisitErrorMessageSuffix = 'μέσα σε συνάρτηση';
-    node.constantDeclarations.forEach(this.visit.bind(this));
-    node.variableDeclarations.forEach(this.visit.bind(this));
-    node.statementList.forEach(this.visit.bind(this));
+    this.visitMultiple(node.constantDeclarations);
+    this.visitMultiple(node.variableDeclarations);
+    this.visitMultiple(node.statementList);
     this.throwOnIOVisit = false;
     this.throwOnIOVisitErrorMessageSuffix = '';
 
@@ -1137,7 +1088,7 @@ export default class TypeChecker extends AST.ASTVisitor<
     return Types.GLOVoid;
   }
 
-  public visitConstantDeclaration(node: AST.ConstantDeclarationAST) {
+  public defaultVisit(node: AST.AST) {
     node.children.forEach(this.visit.bind(this));
     return Types.GLOVoid;
   }

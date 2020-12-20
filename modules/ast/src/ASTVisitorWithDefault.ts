@@ -182,6 +182,10 @@ abstract class ASTVisitorWithDefault<T = unknown> {
       return this.defaultVisit(node);
     }
   }
+
+  public visitMultiple(nodes: AST.AST[]) {
+    return nodes.map(this.visit.bind(this));
+  }
 }
 
 export default ASTVisitorWithDefault;

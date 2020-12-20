@@ -6,7 +6,6 @@ import {
   LocalSymbolScope,
   SymbolScopeType,
   VariableSymbol,
-  GLOSymbol,
 } from '@glossa-glo/symbol';
 import { IntegerConstantAST, VariableAST } from '@glossa-glo/ast';
 import GLOError, {
@@ -14,10 +13,11 @@ import GLOError, {
   assert,
   DebugInfoProviderLike,
 } from '@glossa-glo/error';
-import { toUpperCaseNormalizedGreek } from '@glossa-glo/case-insensitive-map';
 import cloneDeep from 'clone-deep';
 
-export class Interpreter extends AST.ASTVisitor<Promise<Types.GLODataType>> {
+export class Interpreter extends AST.AsyncASTVisitorWithDefault<
+  Types.GLODataType
+> {
   public scope: SymbolScope;
 
   constructor(
@@ -259,42 +259,12 @@ export class Interpreter extends AST.ASTVisitor<Promise<Types.GLODataType>> {
     return variableValue || new Types.GLOVoid();
   }
 
-  public async visitEmpty(node: AST.EmptyAST) {
-    return new Types.GLOVoid();
-  }
-
   public async visitProgram(node: AST.ProgramAST) {
     return await this.withNewScope(node.name, async () => {
-      for (let i = 0; i < node.children.length; i++) {
-        await this.visit(node.children[i]);
-      }
+      await this.visitMultipleInOrder(node.children);
 
       return new Types.GLOVoid();
     });
-  }
-
-  public async visitConstantDeclaration(node: AST.ConstantDeclarationAST) {
-    return new Types.GLOVoid();
-  }
-
-  public async visitVariableDeclaration(node: AST.VariableDeclarationAST) {
-    return new Types.GLOVoid();
-  }
-
-  public async visitReal(node: AST.RealAST) {
-    return new Types.GLOVoid();
-  }
-
-  public async visitInteger(node: AST.IntegerAST) {
-    return new Types.GLOVoid();
-  }
-
-  public async visitBoolean(node: AST.BooleanAST) {
-    return new Types.GLOVoid();
-  }
-
-  public async visitString(node: AST.StringAST) {
-    return new Types.GLOVoid();
   }
 
   public async visitProcedureDeclaration(node: AST.ProcedureDeclarationAST) {
@@ -322,15 +292,9 @@ export class Interpreter extends AST.ASTVisitor<Promise<Types.GLODataType>> {
             scope.changeValue(argName, cloneDeep(args[i]));
           });
 
-        for (let i = 0; i < node.constantDeclarations.length; i++) {
-          await this.visit(node.constantDeclarations[i]);
-        }
-        for (let i = 0; i < node.variableDeclarations.length; i++) {
-          await this.visit(node.variableDeclarations[i]);
-        }
-        for (let i = 0; i < node.statementList.length; i++) {
-          await this.visit(node.statementList[i]);
-        }
+        await this.visitMultipleInOrder(node.constantDeclarations);
+        await this.visitMultipleInOrder(node.variableDeclarations);
+        await this.visitMultipleInOrder(node.statementList);
 
         // Copy out parameter values in parent scope
         for (let i = node.args.length - 1; i >= 0; i--) {
@@ -366,15 +330,11 @@ export class Interpreter extends AST.ASTVisitor<Promise<Types.GLODataType>> {
   public async visitIf(node: AST.IfAST) {
     const condition = await this.visit(node.condition);
     if (condition.equals(Types.GLOBoolean.true)) {
-      for (let i = 0; i < node.statementList.length; i++) {
-        await this.visit(node.statementList[i]);
-      }
+      await this.visitMultipleInOrder(node.statementList);
     } else {
       if (node.next) {
         if (Array.isArray(node.next)) {
-          for (let i = 0; i < node.next.length; i++) {
-            await this.visit(node.next[i]);
-          }
+          await this.visitMultipleInOrder(node.next);
         } else {
           await this.visit(node.next);
         }
@@ -483,9 +443,7 @@ export class Interpreter extends AST.ASTVisitor<Promise<Types.GLODataType>> {
               await this.visit(node.endValue),
             )
       ) {
-        for (let i = 0; i < node.statementList.length; i++) {
-          await this.visit(node.statementList[i]);
-        }
+        await this.visitMultipleInOrder(node.statementList);
 
         await this.visit(
           new AST.AssignmentAST(
@@ -508,18 +466,14 @@ export class Interpreter extends AST.ASTVisitor<Promise<Types.GLODataType>> {
 
   public async visitWhile(node: AST.WhileAST) {
     while ((await this.visit(node.condition)).equals(Types.GLOBoolean.true)) {
-      for (let i = 0; i < node.statementList.length; i++) {
-        await this.visit(node.statementList[i]);
-      }
+      await this.visitMultipleInOrder(node.statementList);
     }
     return new Types.GLOVoid();
   }
 
   public async visitRepeat(node: AST.RepeatAST) {
     do {
-      for (let i = 0; i < node.statementList.length; i++) {
-        await this.visit(node.statementList[i]);
-      }
+      await this.visitMultipleInOrder(node.statementList);
     } while ((await this.visit(node.condition)).equals(Types.GLOBoolean.false));
     return new Types.GLOVoid();
   }
@@ -621,15 +575,9 @@ export class Interpreter extends AST.ASTVisitor<Promise<Types.GLODataType>> {
             scope.changeValue(argName, args[i]);
           });
 
-        for (let i = 0; i < node.constantDeclarations.length; i++) {
-          await this.visit(node.constantDeclarations[i]);
-        }
-        for (let i = 0; i < node.variableDeclarations.length; i++) {
-          await this.visit(node.variableDeclarations[i]);
-        }
-        for (let i = 0; i < node.statementList.length; i++) {
-          await this.visit(node.statementList[i]);
-        }
+        await this.visitMultipleInOrder(node.constantDeclarations);
+        await this.visitMultipleInOrder(node.variableDeclarations);
+        await this.visitMultipleInOrder(node.statementList);
       });
     });
 
@@ -735,6 +683,10 @@ export class Interpreter extends AST.ASTVisitor<Promise<Types.GLODataType>> {
       }
     }
 
+    return new Types.GLOVoid();
+  }
+
+  public async defaultVisit(node: AST.AST) {
     return new Types.GLOVoid();
   }
 

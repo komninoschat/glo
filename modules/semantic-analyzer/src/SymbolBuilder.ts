@@ -57,8 +57,8 @@ export default class SymbolBuilder extends AST.ASTVisitorWithDefault<GLOSymbol.G
       this.currentScope,
     );
     this.currentScope.insert(new ProgramSymbol(node.name));
-    node.declarations.forEach(this.visit.bind(this));
-    node.statementList.forEach(this.visit.bind(this));
+    this.visitMultiple(node.declarations);
+    this.visitMultiple(node.statementList);
     this.currentScope = this.currentScope.getParent()!;
   }
 
@@ -147,7 +147,7 @@ export default class SymbolBuilder extends AST.ASTVisitorWithDefault<GLOSymbol.G
         ).inheritPositionFrom(node.name),
       );
 
-    node.statementList.forEach(this.visit.bind(this));
+    this.visitMultiple(node.statementList);
     this.currentScope = this.currentScope.getParent()!;
   }
 
@@ -196,14 +196,14 @@ export default class SymbolBuilder extends AST.ASTVisitorWithDefault<GLOSymbol.G
       );
 
     this.insideFunction = true;
-    node.statementList.forEach(this.visit.bind(this));
+    this.visitMultiple(node.statementList);
     this.insideFunction = false;
 
     this.currentScope = this.currentScope.getParent()!;
   }
 
   public visitFunctionCall(node: AST.FunctionCallAST) {
-    node.args.forEach(this.visit.bind(this));
+    this.visitMultiple(node.args);
 
     const symbol = this.currentScope.resolve(node.name);
 
@@ -247,7 +247,7 @@ export default class SymbolBuilder extends AST.ASTVisitorWithDefault<GLOSymbol.G
       );
     }
 
-    node.args.forEach(this.visit.bind(this));
+    this.visitMultiple(node.args);
 
     const symbol = this.currentScope.resolve(node.name);
 
@@ -296,8 +296,8 @@ export default class SymbolBuilder extends AST.ASTVisitorWithDefault<GLOSymbol.G
     });
   }
 
-  public defaultVisit(node: AST.WriteAST) {
-    node.children.forEach(this.visit.bind(this));
+  public defaultVisit(node: AST.AST) {
+    this.visitMultiple(node.children);
   }
 
   public run() {

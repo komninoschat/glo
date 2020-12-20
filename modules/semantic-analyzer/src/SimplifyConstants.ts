@@ -26,7 +26,7 @@ export default class SimplifyConstants extends AST.ASTVisitorWithDefault<Types.G
 
   public visitArray(node: AST.ArrayAST) {
     this.visit(node.componentType);
-    const dimensionLength = node.dimensionLength.map(this.visit.bind(this));
+    const dimensionLength = this.visitMultiple(node.dimensionLength);
 
     for (let i = 0; i < dimensionLength.length; i++) {
       const len = dimensionLength[i];
@@ -87,28 +87,23 @@ export default class SimplifyConstants extends AST.ASTVisitorWithDefault<Types.G
 
   public visitProgram(node: AST.ProgramAST) {
     this.withLocalScope(node.name, SymbolScopeType.Program, () => {
-      node.declarations.forEach(this.visit.bind(this));
-      node.statementList.forEach(this.visit.bind(this));
+      this.visitMultiple(node.declarations);
+      this.visitMultiple(node.statementList);
     });
 
     return null;
   }
 
-  public visitVariableDeclaration(node: AST.VariableDeclarationAST) {
-    node.children.forEach(this.visit.bind(this));
-    return null;
-  }
-
   public visitProcedureDeclaration(node: AST.ProcedureDeclarationAST) {
     this.withLocalScope(node.name.name, SymbolScopeType.Procedure, () => {
-      node.children.forEach(this.visit.bind(this));
+      this.visitMultiple(node.children);
     });
     return null;
   }
 
   public visitFunctionDeclaration(node: AST.FunctionDeclarationAST) {
     this.withLocalScope(node.name.name, SymbolScopeType.Function, () => {
-      node.children.forEach(this.visit.bind(this));
+      this.visitMultiple(node.children);
     });
     return null;
   }
@@ -138,11 +133,6 @@ export default class SimplifyConstants extends AST.ASTVisitorWithDefault<Types.G
     }
 
     return returnValue;
-  }
-
-  public visitProcedureCall(node: AST.ProcedureCallAST) {
-    node.children.forEach(this.visit.bind(this));
-    return null;
   }
 
   public visitIntegerConstant(node: AST.IntegerConstantAST) {
@@ -314,8 +304,8 @@ export default class SimplifyConstants extends AST.ASTVisitorWithDefault<Types.G
       : null;
   }
 
-  public defaultVisit(node: AST.WriteAST) {
-    node.children.forEach(this.visit.bind(this));
+  public defaultVisit(node: AST.AST) {
+    this.visitMultiple(node.children);
     return null;
   }
 
