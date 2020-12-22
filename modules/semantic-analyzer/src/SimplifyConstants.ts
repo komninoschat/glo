@@ -8,7 +8,7 @@ import {
   VariableSymbol,
 } from '@glossa-glo/symbol';
 
-export default class SimplifyConstants extends AST.ASTVisitor<Types.GLODataType | null> {
+export default class SimplifyConstants extends AST.ASTVisitorWithDefault<Types.GLODataType | null> {
   private localScope: LocalSymbolScope | null = null;
 
   constructor(
@@ -26,7 +26,7 @@ export default class SimplifyConstants extends AST.ASTVisitor<Types.GLODataType 
 
   public visitArray(node: AST.ArrayAST) {
     this.visit(node.componentType);
-    const dimensionLength = node.dimensionLength.map(this.visit.bind(this));
+    const dimensionLength = this.visitMultiple(node.dimensionLength);
 
     for (let i = 0; i < dimensionLength.length; i++) {
       const len = dimensionLength[i];
@@ -87,28 +87,23 @@ export default class SimplifyConstants extends AST.ASTVisitor<Types.GLODataType 
 
   public visitProgram(node: AST.ProgramAST) {
     this.withLocalScope(node.name, SymbolScopeType.Program, () => {
-      node.declarations.forEach(this.visit.bind(this));
-      node.statementList.forEach(this.visit.bind(this));
+      this.visitMultiple(node.declarations);
+      this.visitMultiple(node.statementList);
     });
 
     return null;
   }
 
-  public visitVariableDeclaration(node: AST.VariableDeclarationAST) {
-    node.children.forEach(this.visit.bind(this));
-    return null;
-  }
-
   public visitProcedureDeclaration(node: AST.ProcedureDeclarationAST) {
     this.withLocalScope(node.name.name, SymbolScopeType.Procedure, () => {
-      node.children.forEach(this.visit.bind(this));
+      this.visitMultiple(node.children);
     });
     return null;
   }
 
   public visitFunctionDeclaration(node: AST.FunctionDeclarationAST) {
     this.withLocalScope(node.name.name, SymbolScopeType.Function, () => {
-      node.children.forEach(this.visit.bind(this));
+      this.visitMultiple(node.children);
     });
     return null;
   }
@@ -138,11 +133,6 @@ export default class SimplifyConstants extends AST.ASTVisitor<Types.GLODataType 
     }
 
     return returnValue;
-  }
-
-  public visitProcedureCall(node: AST.ProcedureCallAST) {
-    node.children.forEach(this.visit.bind(this));
-    return null;
   }
 
   public visitIntegerConstant(node: AST.IntegerConstantAST) {
@@ -314,67 +304,8 @@ export default class SimplifyConstants extends AST.ASTVisitor<Types.GLODataType 
       : null;
   }
 
-  public visitAssignment(node: AST.AssignmentAST) {
-    node.children.forEach(this.visit.bind(this));
-    return null;
-  }
-  public visitEmpty(node: AST.EmptyAST) {
-    node.children.forEach(this.visit.bind(this));
-    return null;
-  }
-  public visitInteger(node: AST.IntegerAST) {
-    node.children.forEach(this.visit.bind(this));
-    return null;
-  }
-  public visitReal(node: AST.RealAST) {
-    node.children.forEach(this.visit.bind(this));
-    return null;
-  }
-  public visitType(node: AST.TypeAST) {
-    node.children.forEach(this.visit.bind(this));
-    return null;
-  }
-  public visitBoolean(node: AST.BooleanAST) {
-    node.children.forEach(this.visit.bind(this));
-    return null;
-  }
-  public visitIf(node: AST.IfAST) {
-    node.children.forEach(this.visit.bind(this));
-    return null;
-  }
-  public visitString(node: AST.StringAST) {
-    node.children.forEach(this.visit.bind(this));
-    return null;
-  }
-  public visitFor(node: AST.ForAST) {
-    node.children.forEach(this.visit.bind(this));
-    return null;
-  }
-  public visitWhile(node: AST.WhileAST) {
-    node.children.forEach(this.visit.bind(this));
-    return null;
-  }
-  public visitRepeat(node: AST.RepeatAST) {
-    node.children.forEach(this.visit.bind(this));
-    return null;
-  }
-  public visitSubrange(node: AST.SubrangeAST) {
-    node.children.forEach(this.visit.bind(this));
-    return null;
-  }
-
-  public visitArrayAccess(node: AST.ArrayAccessAST) {
-    node.children.forEach(this.visit.bind(this));
-    return null;
-  }
-
-  public visitRead(node: AST.ReadAST) {
-    node.children.forEach(this.visit.bind(this));
-    return null;
-  }
-
-  public visitWrite(node: AST.WriteAST) {
-    node.children.forEach(this.visit.bind(this));
+  public defaultVisit(node: AST.AST) {
+    this.visitMultiple(node.children);
     return null;
   }
 

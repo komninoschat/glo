@@ -22,7 +22,7 @@
 
   ΓΙΑ i ΑΠΟ 2 μέχρι n            ! FOR i FROM 2 TO n
     ΑΝ p[i] ΤΟΤΕ                 ! IF p[i] THEN
-      j <- i^2
+      j <- i*i
       ΟΣΟ j <= n ΕΠΑΝΑΛΑΒΕ       ! WHILE j <= n REPEAT
         p[j] <- ΨΕΥΔΗΣ           ! p[j] <- FALSE
         j <- j + i

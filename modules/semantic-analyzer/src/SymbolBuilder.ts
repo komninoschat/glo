@@ -11,7 +11,7 @@ import * as GLOSymbol from '@glossa-glo/symbol';
 import GLOError from '@glossa-glo/error';
 import { ArrayAST, VariableAST } from '@glossa-glo/ast';
 
-export default class SymbolBuilder extends AST.ASTVisitor<GLOSymbol.GLOSymbol | void> {
+export default class SymbolBuilder extends AST.ASTVisitorWithDefault<GLOSymbol.GLOSymbol | void> {
   private currentScope: SymbolScope;
   private insideFunction = false;
 
@@ -57,8 +57,8 @@ export default class SymbolBuilder extends AST.ASTVisitor<GLOSymbol.GLOSymbol | 
       this.currentScope,
     );
     this.currentScope.insert(new ProgramSymbol(node.name));
-    node.declarations.forEach(this.visit.bind(this));
-    node.statementList.forEach(this.visit.bind(this));
+    this.visitMultiple(node.declarations);
+    this.visitMultiple(node.statementList);
     this.currentScope = this.currentScope.getParent()!;
   }
 
@@ -134,8 +134,9 @@ export default class SymbolBuilder extends AST.ASTVisitor<GLOSymbol.GLOSymbol | 
 
     const argNames = node.args.map(arg => arg.name);
 
-    const argSymbols = procedureVariables.filter(symbol =>
-      argNames.includes(symbol.name),
+    const argSymbols = argNames.map(
+      argName =>
+        procedureVariables.find(variable => variable.name === argName)!,
     );
 
     this.currentScope
@@ -147,7 +148,7 @@ export default class SymbolBuilder extends AST.ASTVisitor<GLOSymbol.GLOSymbol | 
         ).inheritPositionFrom(node.name),
       );
 
-    node.statementList.forEach(this.visit.bind(this));
+    this.visitMultiple(node.statementList);
     this.currentScope = this.currentScope.getParent()!;
   }
 
@@ -181,8 +182,8 @@ export default class SymbolBuilder extends AST.ASTVisitor<GLOSymbol.GLOSymbol | 
 
     const argNames = node.args.map(arg => arg.name);
 
-    const argSymbols = functionVariables.filter(symbol =>
-      argNames.includes(symbol.name),
+    const argSymbols = argNames.map(
+      argName => functionVariables.find(variable => variable.name === argName)!,
     );
 
     this.currentScope
@@ -196,14 +197,14 @@ export default class SymbolBuilder extends AST.ASTVisitor<GLOSymbol.GLOSymbol | 
       );
 
     this.insideFunction = true;
-    node.statementList.forEach(this.visit.bind(this));
+    this.visitMultiple(node.statementList);
     this.insideFunction = false;
 
     this.currentScope = this.currentScope.getParent()!;
   }
 
   public visitFunctionCall(node: AST.FunctionCallAST) {
-    node.args.forEach(this.visit.bind(this));
+    this.visitMultiple(node.args);
 
     const symbol = this.currentScope.resolve(node.name);
 
@@ -247,7 +248,7 @@ export default class SymbolBuilder extends AST.ASTVisitor<GLOSymbol.GLOSymbol | 
       );
     }
 
-    node.args.forEach(this.visit.bind(this));
+    this.visitMultiple(node.args);
 
     const symbol = this.currentScope.resolve(node.name);
 
@@ -285,115 +286,6 @@ export default class SymbolBuilder extends AST.ASTVisitor<GLOSymbol.GLOSymbol | 
     }
     this.visit(node.right);
   }
-  public visitEmpty(node: AST.EmptyAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitInteger(node: AST.IntegerAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitIntegerConstant(node: AST.IntegerConstantAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitIntegerDivision(node: AST.IntegerDivisionAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitMinus(node: AST.MinusAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitMultiplication(node: AST.MultiplicationAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitPlus(node: AST.PlusAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitReal(node: AST.RealAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitRealConstant(node: AST.RealConstantAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitRealDivision(node: AST.RealDivisionAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitType(node: AST.TypeAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitUnaryMinus(node: AST.UnaryMinusAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitUnaryPlus(node: AST.UnaryPlusAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitMod(node: AST.ModAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitBoolean(node: AST.BooleanAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitTrue(node: AST.TrueConstantAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitFalse(node: AST.FalseConstantAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitEquals(node: AST.EqualsAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitNotEquals(node: AST.NotEqualsAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitGreaterThan(node: AST.GreaterThanAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitLessThan(node: AST.LessThanAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitGreaterEquals(node: AST.GreaterEqualsAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitLessEquals(node: AST.LessEqualsAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitIf(node: AST.IfAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitExponentiation(node: AST.ExponentiationAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitString(node: AST.StringAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitStringConstant(node: AST.StringConstantAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitAnd(node: AST.AndAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitOr(node: AST.OrAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitNot(node: AST.NotAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitFor(node: AST.ForAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitWhile(node: AST.WhileAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitRepeat(node: AST.RepeatAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitSubrange(node: AST.SubrangeAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-  public visitArray(node: AST.ArrayAST): void {
-    node.children.forEach(this.visit.bind(this));
-  }
-
-  public visitArrayAccess(node: AST.ArrayAccessAST) {
-    node.children.forEach(this.visit.bind(this));
-  }
 
   public visitRead(node: AST.ReadAST) {
     node.children.forEach(child => {
@@ -405,8 +297,8 @@ export default class SymbolBuilder extends AST.ASTVisitor<GLOSymbol.GLOSymbol | 
     });
   }
 
-  public visitWrite(node: AST.WriteAST) {
-    node.children.forEach(this.visit.bind(this));
+  public defaultVisit(node: AST.AST) {
+    this.visitMultiple(node.children);
   }
 
   public run() {

@@ -1,7 +1,7 @@
 import * as Token from './token';
 import CaseInsensitiveMap from '@glossa-glo/case-insensitive-map';
 import * as Types from '@glossa-glo/data-types';
-import GLOError, { DebugInfoProvider } from '@glossa-glo/error';
+import GLOError from '@glossa-glo/error';
 
 export class Lexer {
   public static readonly reservedKeywords = new CaseInsensitiveMap<
@@ -62,7 +62,14 @@ export class Lexer {
 
   private sourceCode: string;
   private position: number;
-  private currentCharacter: string | null;
+
+  private get currentCharacter(): string | null {
+    if (this.position >= this.sourceCode.length) {
+      return null;
+    } else {
+      return this.sourceCode[this.position];
+    }
+  }
 
   public get linePosition(): number {
     return this.sourceCode.slice(0, this.position).split('\n').length - 1;
@@ -89,7 +96,6 @@ export class Lexer {
   constructor(sourceCode: string) {
     this.sourceCode = sourceCode;
     this.position = 0;
-    this.currentCharacter = this.sourceCode[this.position];
   }
 
   private peek(length = 1) {
@@ -104,12 +110,6 @@ export class Lexer {
 
   private advance(length = 1) {
     this.position += length;
-
-    if (this.position >= this.sourceCode.length) {
-      return null;
-    } else {
-      return this.sourceCode[this.position];
-    }
   }
 
   private whitespace() {
@@ -117,13 +117,13 @@ export class Lexer {
       this.currentCharacter !== null &&
       this.currentCharacter.match(this.whitespaceRegex)
     ) {
-      this.currentCharacter = this.advance();
+      this.advance();
     }
   }
 
   private comment() {
     while (this.currentCharacter != '\n' && this.currentCharacter != null) {
-      this.currentCharacter = this.advance();
+      this.advance();
     }
   }
 
@@ -139,7 +139,7 @@ export class Lexer {
       this.currentCharacter.match(this.numberRegex)
     ) {
       number += this.currentCharacter;
-      this.currentCharacter = this.advance();
+      this.advance();
     }
 
     if (
@@ -147,13 +147,13 @@ export class Lexer {
       this.peek() != '.' // Fix conflicts with integer subrange type
     ) {
       number += this.currentCharacter;
-      this.currentCharacter = this.advance();
+      this.advance();
       while (
         this.currentCharacter !== null &&
         this.currentCharacter.match(this.numberRegex)
       ) {
         number += this.currentCharacter;
-        this.currentCharacter = this.advance();
+        this.advance();
       }
 
       return new Token.RealConstToken(new Types.GLOReal(parseFloat(number)))
@@ -177,7 +177,7 @@ export class Lexer {
       this.currentCharacter.match(this.idRegex)
     ) {
       id += this.currentCharacter;
-      this.currentCharacter = this.advance();
+      this.advance();
     }
     if (Lexer.reservedKeywords.has(id)) {
       return (Lexer.reservedKeywords.get(id) as () => Token.Token)()
@@ -210,10 +210,10 @@ export class Lexer {
       }
 
       str += this.currentCharacter;
-      this.currentCharacter = this.advance();
+      this.advance();
     }
 
-    this.currentCharacter = this.advance();
+    this.advance();
 
     return new Token.StringConstantToken(new Types.GLOString(str))
       .inheritStartPositionFrom(this)
@@ -225,7 +225,6 @@ export class Lexer {
     const oldCurrentCharacter = this.currentCharacter;
     const token = this.getNextToken();
     this.position = oldPosition;
-    this.currentCharacter = oldCurrentCharacter;
     return token;
   }
 
@@ -238,14 +237,13 @@ export class Lexer {
         this.comment();
         continue;
       } else if (this.currentCharacter == '<' && this.peek() == '-') {
-        this.currentCharacter = this.advance(2);
+        this.advance(2);
         return new Token.AssignToken()
           .inheritStartPositionFrom(this.getPositionMinus(2))
           .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == '\n') {
-        this.currentCharacter = this.advance();
+        this.advance();
 
-        const savedCurrentCharacter = this.currentCharacter;
         const savedPosition = this.position;
         const nextToken = this.getNextToken();
 
@@ -256,51 +254,50 @@ export class Lexer {
           );
         }
 
-        this.currentCharacter = savedCurrentCharacter;
         this.position = savedPosition;
 
         return new Token.NewLineToken()
           .inheritStartPositionFrom(this.getPositionMinus(1))
           .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == '&') {
-        this.currentCharacter = this.advance();
+        this.advance();
         return new Token.LineMergeToken()
           .inheritStartPositionFrom(this.getPositionMinus(1))
           .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == '+') {
-        this.currentCharacter = this.advance();
+        this.advance();
         return new Token.PlusToken()
           .inheritStartPositionFrom(this.getPositionMinus(1))
           .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == '-') {
-        this.currentCharacter = this.advance();
+        this.advance();
         return new Token.MinusToken()
           .inheritStartPositionFrom(this.getPositionMinus(1))
           .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == '*') {
-        this.currentCharacter = this.advance();
+        this.advance();
         return new Token.MultiplicationToken()
           .inheritStartPositionFrom(this.getPositionMinus(1))
           .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == '/') {
-        this.currentCharacter = this.advance();
+        this.advance();
         return new Token.RealDivisionToken()
           .inheritStartPositionFrom(this.getPositionMinus(1))
           .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == '(') {
-        this.currentCharacter = this.advance();
+        this.advance();
         return new Token.OpeningParenthesisToken()
           .inheritStartPositionFrom(this.getPositionMinus(1))
           .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == ')') {
-        this.currentCharacter = this.advance();
+        this.advance();
         return new Token.ClosingParenthesisToken()
           .inheritStartPositionFrom(this.getPositionMinus(1))
           .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == '.') {
-        this.currentCharacter = this.advance();
+        this.advance();
         if (this.currentCharacter == '.') {
-          this.currentCharacter = this.advance();
+          this.advance();
           return new Token.DoubleDotToken()
             .inheritStartPositionFrom(this.getPositionMinus(2))
             .inheritEndPositionFrom(this);
@@ -310,63 +307,63 @@ export class Lexer {
             .inheritEndPositionFrom(this);
         }
       } else if (this.currentCharacter == ':') {
-        this.currentCharacter = this.advance();
+        this.advance();
         return new Token.ColonToken()
           .inheritStartPositionFrom(this.getPositionMinus(1))
           .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == ',') {
-        this.currentCharacter = this.advance();
+        this.advance();
         return new Token.CommaToken()
           .inheritStartPositionFrom(this.getPositionMinus(1))
           .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == '=') {
-        this.currentCharacter = this.advance();
+        this.advance();
         return new Token.EqualsToken()
           .inheritStartPositionFrom(this.getPositionMinus(1))
           .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == '<' && this.peek() == '>') {
-        this.currentCharacter = this.advance(2);
+        this.advance(2);
         return new Token.NotEqualsToken()
           .inheritStartPositionFrom(this.getPositionMinus(2))
           .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == '>' && this.peek() == '=') {
-        this.currentCharacter = this.advance(2);
+        this.advance(2);
         return new Token.GreaterEqualsToken()
           .inheritStartPositionFrom(this.getPositionMinus(2))
           .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == '<' && this.peek() == '=') {
-        this.currentCharacter = this.advance(2);
+        this.advance(2);
         return new Token.LessEqualsToken()
           .inheritStartPositionFrom(this.getPositionMinus(2))
           .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == '>') {
-        this.currentCharacter = this.advance();
+        this.advance();
         return new Token.GreaterThanToken()
           .inheritStartPositionFrom(this.getPositionMinus(1))
           .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == '<') {
-        this.currentCharacter = this.advance();
+        this.advance();
         return new Token.LessThanToken()
           .inheritStartPositionFrom(this.getPositionMinus(1))
           .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == '[') {
-        this.currentCharacter = this.advance();
+        this.advance();
         return new Token.OpeningBracketToken()
           .inheritStartPositionFrom(this.getPositionMinus(1))
           .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == ']') {
-        this.currentCharacter = this.advance();
+        this.advance();
         return new Token.ClosingBracketToken()
           .inheritStartPositionFrom(this.getPositionMinus(1))
           .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == "'" || this.currentCharacter == '"') {
         const stringTerminator = this.currentCharacter;
-        this.currentCharacter = this.advance();
+        this.advance();
         return this.stringConstant(stringTerminator)
           .inheritStartPositionFrom(this.getPositionMinus(1))
           .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == '^') {
-        this.currentCharacter = this.advance();
+        this.advance();
         return new Token.ExponentiationToken()
           .inheritStartPositionFrom(this.getPositionMinus(1))
           .inheritEndPositionFrom(this);

@@ -1,8 +1,7 @@
 import * as AST from './AST';
 import GLOError from '@glossa-glo/error';
 
-export default abstract class ASTVisitor<T = unknown> {
-  protected abstract readonly ast: AST.AST;
+abstract class ASTVisitor<T = unknown> {
   public abstract visitAssignment(node: AST.AssignmentAST): T;
   public abstract visitEmpty(node: AST.EmptyAST): T;
   public abstract visitInteger(node: AST.IntegerAST): T;
@@ -148,8 +147,14 @@ export default abstract class ASTVisitor<T = unknown> {
     } else {
       throw new GLOError(
         node,
-        `Program error: Unknown AST node type on visitor ${node.constructor.name}`,
+        `Program error: Unknown or not implemented AST node type on visitor ${node.constructor.name}`,
       );
     }
   }
+
+  public visitMultiple(nodes: AST.AST[]): T[] {
+    return nodes.map(this.visit.bind(this));
+  }
 }
+
+export default ASTVisitor;
