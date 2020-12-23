@@ -134,8 +134,9 @@ export default class SymbolBuilder extends AST.ASTVisitorWithDefault<GLOSymbol.G
 
     const argNames = node.args.map(arg => arg.name);
 
-    const argSymbols = procedureVariables.filter(symbol =>
-      argNames.includes(symbol.name),
+    const argSymbols = argNames.map(
+      argName =>
+        procedureVariables.find(variable => variable.name === argName)!,
     );
 
     this.currentScope
@@ -181,8 +182,8 @@ export default class SymbolBuilder extends AST.ASTVisitorWithDefault<GLOSymbol.G
 
     const argNames = node.args.map(arg => arg.name);
 
-    const argSymbols = functionVariables.filter(symbol =>
-      argNames.includes(symbol.name),
+    const argSymbols = argNames.map(
+      argName => functionVariables.find(variable => variable.name === argName)!,
     );
 
     this.currentScope
