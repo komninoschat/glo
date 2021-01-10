@@ -1,6 +1,7 @@
 import { Command, flags } from '@oclif/command';
 import { readFileSync } from 'fs';
 import interpret from '@glossa-glo/glo';
+import interpretPseudo from '@glossa-glo/ps';
 import GLOError from '@glossa-glo/error';
 import chalk from 'chalk';
 import cli from 'cli-ux';
@@ -58,6 +59,7 @@ class Psi extends Command {
   static flags = {
     version: flags.version({ char: 'v' }),
     help: flags.help({ char: 'h' }),
+    pseudo: flags.boolean(),
   };
 
   static args = [
@@ -97,7 +99,7 @@ class Psi extends Command {
     });
 
     try {
-      await interpret(sourceCode, {
+      await (flags.pseudo ? interpretPseudo : interpret)(sourceCode, {
         read: () => {
           return new Promise((resolve, reject) => {
             rl.question('', data => {

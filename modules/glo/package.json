@@ -21,9 +21,12 @@
     "url": "git+https://github.com/komninoschat/glo.git"
   },
   "scripts": {
-    "prepare": "tsc",
+    "prepare": "tsc -p tsconfig.build.json",
     "test": "cross-env NODE_ENV=development mocha \"./__tests__/**/*.test.ts\" --opts=__tests__/mocha.opts",
-    "test-cover": "cross-env NODE_ENV=development nyc mocha \"./__tests__/**/*.test.ts\" -- --opts=__tests__/mocha.opts"
+    "test-cover": "cross-env NODE_ENV=development nyc mocha \"./__tests__/**/*.test.ts\" -- --opts=__tests__/mocha.opts",
+    "build": "npm run clean && npm run compile",
+    "clean": "rm -rf ./dist",
+    "compile": "tsc -p tsconfig.build.json"
   },
   "bugs": {
     "url": "https://github.com/komninoschat/glo/issues"
@@ -33,7 +36,7 @@
     "@glossa-glo/error": "^1.0.2-beta",
     "@glossa-glo/interpreter": "^4.0.1-beta",
     "@glossa-glo/lexer": "^4.0.1-beta",
-    "@glossa-glo/library": "^4.0.1-beta",
+    "@glossa-glo/library-glossa": "^4.0.1-beta",
     "@glossa-glo/parser": "^4.0.1-beta",
     "@glossa-glo/semantic-analyzer": "^4.0.1-beta",
     "@glossa-glo/symbol": "^4.0.1-beta"

@@ -1,5 +1,5 @@
 import { GLODataType, GLOReal } from '@glossa-glo/data-types';
-import LibraryFunction from './LibraryFunction';
+import { LibraryFunction } from '@glossa-glo/library';
 
 export default new LibraryFunction(
   'Ε',

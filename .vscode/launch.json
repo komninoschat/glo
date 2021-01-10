@@ -3,6 +3,10 @@
   // Hover to view descriptions of existing attributes.
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
+  "resolveSourceMapLocations": [
+    "${workspaceFolder}/**",
+    "!**/node_modules/**"
+  ],
   "configurations": [
     {
       "type": "node",
@@ -12,6 +16,17 @@
       // "preLaunchTask": "lerna bootstrap",
       "args": [
         "test.glo"
+      ],
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "test.ps",
+      "program": "${workspaceFolder}/modules/cli/bin/run",
+      // "preLaunchTask": "lerna bootstrap",
+      "args": [
+        "--pseudo",
+        "test.ps"
       ],
     }
   ]

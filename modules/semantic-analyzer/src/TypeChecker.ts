@@ -13,7 +13,7 @@ import {
 } from '@glossa-glo/symbol';
 import GLOError, { assert, assertEquality } from '@glossa-glo/error';
 
-export default class TypeChecker extends AST.ASTVisitorWithDefault<
+export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
   typeof Types.GLODataType
 > {
   private currentScope: SymbolScope;

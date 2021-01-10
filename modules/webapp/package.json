@@ -19,6 +19,8 @@
     "@glossa-glo/error": "^1.0.2-beta",
     "@glossa-glo/glo": "^4.0.1-beta",
     "@glossa-glo/interpreter": "^4.0.1-beta",
+    "@glossa-glo/ps": "^4.0.1-beta",
+    "@glossa-glo/pseudoglossa-interpreter": "^4.0.1-beta",
     "@glossa-glo/symbol": "^4.0.1-beta",
     "@linusborg/vue-simple-portal": "^0.1.4",
     "@nuxt/typescript-build": "^0.6.6",

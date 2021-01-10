@@ -15,7 +15,7 @@ import GLOError, {
 } from '@glossa-glo/error';
 import cloneDeep from 'clone-deep';
 
-export class Interpreter extends AST.AsyncASTVisitorWithDefault<
+export class Interpreter extends AST.GlossaAsyncASTVisitorWithDefault<
   Types.GLODataType
 > {
   public scope: SymbolScope;

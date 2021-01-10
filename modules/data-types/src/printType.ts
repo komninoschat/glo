@@ -9,6 +9,7 @@ import {
   GLOFunction,
   GLOSubrange,
 } from '.';
+import GLONumber from './GLONumber';
 
 export default function printType(type: typeof GLODataType): string {
   if (type && type.multitype) return type.multitype.map(printType).join(' ή ');
@@ -26,5 +27,6 @@ export default function printType(type: typeof GLODataType): string {
   else if (type === GLOReal) return 'Πραγματική';
   else if (type === GLOSubrange) return 'Εύρος';
   else if (type === GLOVoid) return 'Κενό';
+  else if (type === GLONumber) return 'Αριθμός';
   else return `Άγνωστο`;
 }

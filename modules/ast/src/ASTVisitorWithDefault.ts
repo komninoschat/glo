@@ -47,6 +47,8 @@ interface ASTVisitorWithDefault<T = unknown> {
   visitWrite?(node: AST.WriteAST): T;
   visitExponentiation?(node: AST.ExponentiationAST): T;
   visitConstantDeclaration?(node: AST.ConstantDeclarationAST): T;
+  visitSwap?(node: AST.SwapAST): T;
+  visitNumberConstant?(node: AST.NumberConstantAST): T;
 }
 
 abstract class ASTVisitorWithDefault<T = unknown> {
@@ -178,6 +180,13 @@ abstract class ASTVisitorWithDefault<T = unknown> {
       this.visitConstantDeclaration
     ) {
       return this.visitConstantDeclaration(node);
+    } else if (node instanceof AST.SwapAST && this.visitSwap) {
+      return this.visitSwap(node);
+    } else if (
+      node instanceof AST.NumberConstantAST &&
+      this.visitNumberConstant
+    ) {
+      return this.visitNumberConstant(node);
     } else {
       return this.defaultVisit(node);
     }

@@ -1,0 +1,48 @@
+{
+  "name": "@glossa-glo/library-pseudoglossa",
+  "version": "4.0.1-beta",
+  "description": "GLO Pseudoglossa library",
+  "author": "komninoschat <komninoschat@gmail.com>",
+  "homepage": "https://github.com/komninoschat/glo#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "main": "lib/LibraryGlossa.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/komninoschat/glo.git"
+  },
+  "scripts": {
+    "prepare": "tsc",
+    "test": "cross-env NODE_ENV=development mocha \"./__tests__/**/*.test.ts\" --opts=__tests__/mocha.opts",
+    "test-cover": "cross-env NODE_ENV=development nyc mocha \"./__tests__/**/*.test.ts\" -- --opts=__tests__/mocha.opts"
+  },
+  "bugs": {
+    "url": "https://github.com/komninoschat/glo/issues"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.0",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.7.2",
+    "chai": "^4.2.0",
+    "cross-env": "^5.2.0",
+    "mocha": "^6.2.0",
+    "nyc": "^14.1.1",
+    "ts-node": "^8.3.0",
+    "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "@glossa-glo/data-types": "^3.0.0-beta",
+    "@glossa-glo/error": "^1.0.2-beta",
+    "@glossa-glo/symbol": "^4.0.1-beta",
+    "@glossa-glo/library": "^4.0.1-beta"
+  }
+}

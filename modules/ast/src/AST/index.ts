@@ -49,6 +49,9 @@ import ProcedureCallAST from './ProcedureCallAST';
 import ArrayAST from './ArrayAST';
 import ExponentiationAST from './ExponentiationAST';
 import ConstantDeclarationAST from './ConstantDeclarationAST';
+import SwapAST from './SwapAST';
+import AlgorithmAST from './AlgorithmAST';
+import NumberConstantAST from './NumberConstantAST';
 
 export {
   AST,
@@ -102,4 +105,7 @@ export {
   ArrayAST,
   ExponentiationAST,
   ConstantDeclarationAST,
+  SwapAST,
+  AlgorithmAST,
+  NumberConstantAST,
 };
