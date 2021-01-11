@@ -1,12 +1,13 @@
 import ArrayAccessAST from './ArrayAccessAST';
-import BinaryAST from './BinaryAST';
+import AST from './AST';
 import VariableAST from './VariableAST';
 
-export default class SwapAST extends BinaryAST {
+export default class SwapAST extends AST {
   constructor(
     public readonly left: VariableAST | ArrayAccessAST,
     public readonly right: VariableAST | ArrayAccessAST,
   ) {
-    super(left, right);
+    super();
+    this.addChild(left, right);
   }
 }
