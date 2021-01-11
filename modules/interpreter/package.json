@@ -9,6 +9,7 @@
   },
   "license": "MIT",
   "main": "lib/Interpreter.js",
+  "typings": "lib/Interpreter.d.ts",
   "directories": {
     "lib": "lib",
     "test": "__tests__"
@@ -45,7 +46,6 @@
     "cross-env": "^5.2.0",
     "mocha": "^6.2.0",
     "nyc": "^14.1.1",
-    "ts-node": "^8.3.0",
-    "typescript": "^3.5.3"
+    "ts-node": "^8.3.0"
   }
 }

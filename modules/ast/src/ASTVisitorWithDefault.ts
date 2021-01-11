@@ -49,6 +49,7 @@ interface ASTVisitorWithDefault<T = unknown> {
   visitConstantDeclaration?(node: AST.ConstantDeclarationAST): T;
   visitSwap?(node: AST.SwapAST): T;
   visitNumberConstant?(node: AST.NumberConstantAST): T;
+  visitAlgorithm?(node: AST.AlgorithmAST): T;
 }
 
 abstract class ASTVisitorWithDefault<T = unknown> {
@@ -187,6 +188,8 @@ abstract class ASTVisitorWithDefault<T = unknown> {
       this.visitNumberConstant
     ) {
       return this.visitNumberConstant(node);
+    } else if (node instanceof AST.AlgorithmAST && this.visitAlgorithm) {
+      return this.visitAlgorithm(node);
     } else {
       return this.defaultVisit(node);
     }

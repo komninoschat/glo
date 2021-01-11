@@ -5,11 +5,11 @@ import AsyncASTVisitorWithDefault from './AsyncVisitorWithDefault';
 import GlossaASTVisitor from './GlossaASTVisitor';
 import GlossaASTVisitorWithDefault from './GlossaASTVisitorWithDefault';
 import GlossaAsyncASTVisitor from './GlossaAsyncASTVisitor';
-import GlossaAsyncASTVisitorWithDefault from './GlossaAsyncVisitorWithDefault';
+import GlossaAsyncASTVisitorWithDefault from './GlossaAsyncASTVisitorWithDefault';
 import PseudoglossaASTVisitor from './PseudoglossaASTVisitor';
 import PseudoglossaASTVisitorWithDefault from './PseudoglossaASTVisitorWithDefault';
 import PseudoglossaAsyncASTVisitor from './PseudoglossaAsyncASTVisitor';
-import PseudoglossaAsyncASTVisitorWithDefault from './PseudoglossaAsyncVisitorWithDefault';
+import PseudoglossaAsyncASTVisitorWithDefault from './PseudoglossaAsyncASTVisitorWithDefault';
 
 export * from './AST/index';
 export {
