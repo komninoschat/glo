@@ -1,6 +1,6 @@
 {
   "name": "@glossa-glo/cli",
-  "version": "4.1.0-beta",
+  "version": "4.1.1-beta",
   "description": "GLO cli",
   "author": "komninoschat <komninoschat@gmail.com>",
   "homepage": "https://github.com/komninoschat/glo#readme",
@@ -33,9 +33,9 @@
     "url": "https://github.com/komninoschat/glo/issues"
   },
   "dependencies": {
-    "@glossa-glo/error": "^4.1.0-beta",
-    "@glossa-glo/glo": "^4.1.0-beta",
-    "@glossa-glo/ps": "^4.1.0-beta",
+    "@glossa-glo/error": "^4.1.1-beta",
+    "@glossa-glo/glo": "^4.1.1-beta",
+    "@glossa-glo/ps": "^4.1.1-beta",
     "@oclif/command": "^1.5.18",
     "@oclif/config": "^1.13.3",
     "@oclif/plugin-help": "^2.2.1",
