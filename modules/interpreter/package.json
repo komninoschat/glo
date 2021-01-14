@@ -1,6 +1,6 @@
 {
   "name": "@glossa-glo/interpreter",
-  "version": "4.2.0-beta",
+  "version": "4.2.2-beta",
   "description": "GLO interpreter",
   "author": "komninoschat <komninoschat@gmail.com>",
   "homepage": "https://github.com/komninoschat/glo#readme",
@@ -34,7 +34,7 @@
     "@glossa-glo/case-insensitive-map": "^4.2.0-beta",
     "@glossa-glo/data-types": "^4.2.0-beta",
     "@glossa-glo/error": "^4.2.0-beta",
-    "@glossa-glo/symbol": "^4.2.0-beta",
+    "@glossa-glo/symbol": "^4.2.2-beta",
     "clone-deep": "^4.0.1",
     "typescript": "3.9"
   },
