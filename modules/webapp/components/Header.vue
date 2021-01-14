@@ -1,7 +1,11 @@
 <template lang="pug">
   .header(:class="darkmode ? 'darkmode': ''")
-    img.logo.logo-regular(:src="!darkmode ? img('logo-day.png') : img('logo-night.png')")
-    img.logo.logo-small(:src="!darkmode ? img('logo-day-small.png') : img('logo-night-small.png')")
+    template(v-if="!isPseudoglossa")
+      img.logo.logo-regular(:src="!darkmode ? img('logo-day.png') : img('logo-night.png')")
+      img.logo.logo-small(:src="!darkmode ? img('logo-day-small.png') : img('logo-night-small.png')")
+    template(v-else)
+      img.logo.logo-regular(:src="!darkmode ? img('pseudo-logo-day.png') : img('pseudo-logo-night.png')")
+      img.logo.logo-small(:src="!darkmode ? img('pseudo-logo-day-small.png') : img('pseudo-logo-night-small.png')")
     .buttons
       ButtonPrimary.interpret(
         v-if="!actionBeingPerformed"
@@ -182,6 +186,7 @@ export default class Header extends Vue {
   @Prop() darkmode!: boolean;
   @Prop() actionBeingPerformed!: boolean;
   @Prop() lastStep!: boolean;
+  @Prop() isPseudoglossa!: boolean;
 
   showInputFile = false;
 

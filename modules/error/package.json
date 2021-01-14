@@ -41,6 +41,7 @@
     "ts-node": "^8.3.0"
   },
   "dependencies": {
-    "deep-equal": "^2.0.3"
+    "deep-equal": "^2.0.3",
+    "typescript": "3.9"
   }
 }

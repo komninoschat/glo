@@ -32,7 +32,6 @@ export class Lexer {
     ['ΜΕΧΡΙΣ_ΟΤΟΥ', () => new Token.UntilToken()],
     ['ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ', () => new Token.LoopEndToken()],
     ['ΜΕ_ΒΗΜΑ', () => new Token.WithStepToken()],
-    ['ΚΑΛΕΣΕ', () => new Token.CallToken()],
     ['ΔΙΑΒΑΣΕ', () => new Token.ReadToken()],
     ['ΓΡΑΨΕ', () => new Token.WriteToken()],
     ['ΑΛΛΙΩΣ_ΑΝ', () => new Token.ElseIfToken()],
@@ -64,6 +63,7 @@ export class Lexer {
     ['ΠΡΑΓΜΑΤΙΚΗ', () => new Token.RealSingularToken()],
     ['ΛΟΓΙΚΗ', () => new Token.BooleanSingularToken()],
     ['ΧΑΡΑΚΤΗΡΑΣ', () => new Token.StringSingularToken()],
+    ['ΚΑΛΕΣΕ', () => new Token.CallToken()],
   ]);
 
   public static readonly pseudoglossaReservedKeywords = new CaseInsensitiveMap<
@@ -263,7 +263,7 @@ export class Lexer {
     this.advance();
 
     return new Token.StringConstantToken(new Types.GLOString(str))
-      .inheritStartPositionFrom(this)
+      .inheritStartPositionFrom(startPosition.start)
       .inheritEndPositionFrom(this);
   }
 
@@ -328,9 +328,14 @@ export class Lexer {
           .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == '/') {
         this.advance();
-        return new Token.RealDivisionToken()
-          .inheritStartPositionFrom(this.getPositionMinus(1))
-          .inheritEndPositionFrom(this);
+        if (this.currentCharacter == '/')
+          return new Token.DoubleSlashToken()
+            .inheritStartPositionFrom(this.getPositionMinus(2))
+            .inheritEndPositionFrom(this);
+        else
+          return new Token.RealDivisionToken()
+            .inheritStartPositionFrom(this.getPositionMinus(1))
+            .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == '(') {
         this.advance();
         return new Token.OpeningParenthesisToken()
@@ -406,9 +411,7 @@ export class Lexer {
       } else if (this.currentCharacter == "'" || this.currentCharacter == '"') {
         const stringTerminator = this.currentCharacter;
         this.advance();
-        return this.stringConstant(stringTerminator)
-          .inheritStartPositionFrom(this.getPositionMinus(1))
-          .inheritEndPositionFrom(this);
+        return this.stringConstant(stringTerminator);
       } else if (this.currentCharacter == '^') {
         this.advance();
         return new Token.ExponentiationToken()

@@ -36,6 +36,7 @@
     "vue": "^2.6.11",
     "vue-codemirror": "^4.0.6",
     "vue-fullscreen": "^2.1.6",
+    "vue-resize-split-pane": "^0.1.5",
     "vue-save-state": "^1.2.0"
   },
   "devDependencies": {
@@ -46,7 +47,6 @@
     "stylus": "^0.54.7",
     "stylus-loader": "^3.0.2",
     "ts-loader": "^8.0.11",
-    "ts-node-dev": "^1.0.0-pre.44",
-    "typescript": "^4"
+    "ts-node-dev": "^1.0.0-pre.44"
   }
 }

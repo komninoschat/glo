@@ -4,7 +4,9 @@ import * as AST from '@glossa-glo/ast';
 import {
   SymbolScope,
   BaseSymbolScope,
+  LocalSymbolScope,
   VariableSymbol,
+  SymbolScopeType,
 } from '@glossa-glo/symbol';
 import GLOError, {
   assertEquality,
@@ -15,9 +17,11 @@ import GLOError, {
 export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWithDefault<
   Types.GLODataType
 > {
+  private scope: SymbolScope;
+
   constructor(
     protected readonly ast: AST.AST,
-    public readonly scope: BaseSymbolScope,
+    public readonly baseScope: BaseSymbolScope,
     private readonly options: {
       read: (debugInfoProvider: DebugInfoProvider) => Promise<string>;
       write: (...data: string[]) => Promise<void>;
@@ -25,6 +29,7 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
     },
   ) {
     super();
+    this.scope = baseScope;
   }
 
   public async visit(node: AST.AST) {
@@ -33,6 +38,27 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
     }
 
     return super.visit(node);
+  }
+
+  private async withNewScope<T>(
+    name: string,
+    fn: (scope: LocalSymbolScope) => Promise<T>,
+    type?: SymbolScopeType,
+  ) {
+    let scope = this.scope.children.get(name);
+
+    if (!scope) {
+      if (type) scope = new LocalSymbolScope(name, type, this.scope);
+      else
+        throw new Error(
+          `Program error: Scope with name ${name} does not exist on scope ${this.scope.name}`,
+        );
+    }
+
+    this.scope = scope;
+    const result = await fn(scope);
+    this.scope = this.scope.getParent()!;
+    return result;
   }
 
   public async visitAssignment(node: AST.AssignmentAST) {
@@ -49,6 +75,14 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
           ).inheritPositionFrom(left),
         );
 
+      const leftValue = this.scope.resolveValue(left.name);
+      if (leftValue && leftValue.isArray) {
+        throw new GLOError(
+          node,
+          `Το σύμβολο ${left.name} έχει αρχικοποιηθεί ήδη ως πίνακας. Δεν μπορεί να ξαναρχικοποιηθεί ως μεταβλητή`,
+        );
+      }
+
       Types.assertTypeEquality({
         node,
         allowPromoteLeft: false,
@@ -58,20 +92,56 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
 
       this.scope.changeValue(left.name, newValue);
     } else if (left instanceof AST.ArrayAccessAST) {
-      if (!this.scope.resolve(left.array.name))
-        new VariableSymbol(
-          left.array.name,
+      if (!this.scope.resolve(left.array.name)) {
+        const arrayConstructor = Types.createGLOArray(
           newValue.constructor as typeof Types.GLODataType,
-          false,
-          new Array(left.accessors.length).fill(
-            new AST.NumberConstantAST(new Types.GLONumber(Infinity)),
-          ),
-        ).inheritPositionFrom(node.left);
+          Array(left.accessors.length).fill(Infinity),
+        );
+        this.scope.insert(
+          new VariableSymbol(
+            left.array.name,
+            arrayConstructor,
+            false,
+            new Array(left.accessors.length).fill(
+              new AST.NumberConstantAST(new Types.GLONumber(Infinity)),
+            ),
+          ).inheritPositionFrom(node.left),
+        );
 
-      const dimensionLength = this.scope.resolve(
-        left.array.name,
-        VariableSymbol,
-      )!.dimensionLength!;
+        this.scope.changeValue(left.array.name, new arrayConstructor());
+      }
+
+      const leftValue = this.scope.resolveValue(left.array.name);
+      if (leftValue && !leftValue.isArray) {
+        throw new GLOError(
+          node,
+          `Το σύμβολο ${left.array.name} έχει αρχικοποιηθεί ήδη ως μεταβλητή. Δεν μπορεί να ξαναρχικοποιηθεί ως πίνακας`,
+        );
+      }
+
+      const arraySymbol = this.scope.resolve(left.array.name, VariableSymbol)!;
+
+      const dimensionLength = arraySymbol.dimensionLength!;
+
+      assertEquality(
+        left,
+        left.accessors.length,
+        dimensionLength.length,
+        `Ο πίνακας είναι ${dimensionLength.length}-διάστατος αλλά ${
+          left.accessors.length === 1 ? 'δόθηκε' : 'δόθηκαν'
+        } ${left.accessors.length} ${
+          left.accessors.length === 1 ? 'δείκτης' : 'δείκτες'
+        }`,
+      );
+
+      Types.assertTypeEquality({
+        node: node.right,
+        left: (arraySymbol.type as any).componentType,
+        right: newValue.constructor as typeof Types.GLODataType,
+        allowPromoteLeft: false,
+        message:
+          'Περίμενα μεταβλητη τύπου LEFT_TYPE αλλά έλαβα μεταβλητή τύπου RIGHT_TYPE',
+      });
 
       const accessorValues = await Promise.all(
         left.accessors.map(node => this.visit(node)),
@@ -79,6 +149,21 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
 
       for (let i = 0; i < accessorValues.length; i++) {
         const accessorValue = accessorValues[i];
+
+        Types.assertTypeEquality({
+          node: left.accessors[i],
+          left: Types.GLONumber,
+          right: accessorValue.constructor as typeof Types.GLODataType,
+          message: `Περίμενα τον δείκτη του πίνακα '${left.array.name}' να είναι τύπου LEFT_TYPE αλλά έλαβα μη συμβατό τύπο RIGHT_TYPE`,
+          allowPromoteLeft: false,
+        });
+
+        assertEquality(
+          left.accessors[i],
+          (accessorValue as Types.GLONumber).isInteger(),
+          true,
+          `Περίμενα τον δείκτη του πίνακα '${left.array.name}' να είναι ακέραιος αριθμός αλλά έλαβα πραγματικό αριθμό`,
+        );
 
         assert(
           left.accessors[i],
@@ -400,7 +485,13 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
   }
 
   public async visitAlgorithm(node: AST.AlgorithmAST) {
-    await this.visitMultipleInOrder(node.children);
+    await this.withNewScope(
+      node.name,
+      async () => {
+        await this.visitMultipleInOrder(node.children);
+      },
+      SymbolScopeType.Algorithm,
+    );
 
     return new Types.GLOVoid();
   }
@@ -669,6 +760,21 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
     for (let i = 0; i < accessorValues.length; i++) {
       const accessorValue = accessorValues[i];
 
+      Types.assertTypeEquality({
+        node: node.accessors[i],
+        left: Types.GLONumber,
+        right: accessorValue.constructor as typeof Types.GLODataType,
+        message: `Περίμενα τον δείκτη του πίνακα '${node.array.name}' να είναι τύπου LEFT_TYPE αλλά έλαβα μη συμβατό τύπο RIGHT_TYPE`,
+        allowPromoteLeft: false,
+      });
+
+      assertEquality(
+        node.accessors[i],
+        (accessorValue as Types.GLONumber).isInteger(),
+        true,
+        `Περίμενα τον δείκτη του πίνακα '${node.array.name}' να είναι ακέραιος αριθμός αλλά έλαβα πραγματικό αριθμό`,
+      );
+
       assert(
         node.accessors[i],
         accessorValue.greaterEqualsThan(new Types.GLONumber(1)),
@@ -707,11 +813,6 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
   }
 
   public async visitRead(node: AST.ReadAST) {
-    const noInfoError = new DebugInfoProvider([
-      [-1, -1],
-      [-1, -1],
-    ]);
-
     const argNames = node.args.map(arg =>
       arg instanceof AST.VariableAST ? arg.name : arg.array.name,
     );
@@ -744,7 +845,7 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
           values.push(new Types.GLONumber(parseInt(reading)));
         } else {
           throw new GLOError(
-            noInfoError,
+            argNode,
             `Περίμενα να διαβάσω νούμερο στη μεταβλητή ${name} αλλά έλαβα μη έγκυρο νούμερο '${reading}'`,
           );
         }
@@ -784,17 +885,24 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
           );
         this.scope.changeValue(arg.name, value);
       } else {
-        if (!this.scope.resolveValue(arg.array.name))
+        if (!this.scope.resolveValue(arg.array.name)) {
+          const arrayConstructor = Types.createGLOArray(
+            variableTypes[i]!,
+            Array(arg.accessors.length).fill(Infinity),
+          );
           this.scope.insert(
             new VariableSymbol(
               arg.array.name,
-              variableTypes[i]!,
+              arrayConstructor,
               false,
               new Array(arg.accessors.length).fill(
                 new AST.NumberConstantAST(new Types.GLONumber(Infinity)),
               ),
             ),
           );
+
+          this.scope.changeValue(arg.array.name, new arrayConstructor());
+        }
         this.scope.changeArrayValue(
           arg.array.name,
           await Promise.all(arg.accessors.map(arg => this.visit(arg))),
@@ -802,6 +910,65 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
         );
       }
     }
+
+    return new Types.GLOVoid();
+  }
+
+  public async visitFunctionCall(node: AST.FunctionCallAST) {
+    const args = await Promise.all(node.args.map(arg => this.visit(arg)));
+    const func = this.scope.resolveValue<Types.GLOFunction>(node.name);
+
+    if (!func) {
+      throw new GLOError(node, `Δεν υπάρχει συνάρτηση με όνομα ${node.name}`);
+    }
+
+    await func.call(args, node.args);
+
+    const returnValue = this.scope.resolveValue<Types.GLOFunction>(node.name)!
+      .returnValue;
+
+    if (!returnValue) {
+      throw new GLOError(
+        node,
+        `Η συνάρτηση '${node.name}' δεν επιστρέφει κάποια τιμή`,
+      );
+    }
+
+    return returnValue;
+  }
+
+  public async visitSwap(node: AST.SwapAST) {
+    const leftValue = await (node.left instanceof AST.VariableAST
+      ? this.visitVariable(node.left)
+      : this.visitArrayAccess(node.left));
+    const rightValue = await (node.right instanceof AST.VariableAST
+      ? this.visitVariable(node.right)
+      : this.visitArrayAccess(node.right));
+
+    assertInstanceTypeEquality({
+      node,
+      left: leftValue,
+      right: rightValue,
+      message: `Δεν μπορώ να αντιμεταθέσω μεταβλητές μη συμβατού τύπου LEFT_TYPE και RIGHT_TYPE`,
+    });
+
+    // TODO: Add this function to SymbolScope??
+    const changeValue = async (
+      node: AST.VariableAST | AST.ArrayAccessAST,
+      value: Types.GLODataType,
+    ) =>
+      node instanceof AST.VariableAST
+        ? this.scope.changeValue(node.name, value)
+        : this.scope.changeArrayValue(
+            node.array.name,
+            await Promise.all(
+              node.accessors.map(accessor => this.visit(accessor)),
+            ),
+            value,
+          );
+
+    changeValue(node.left, rightValue);
+    changeValue(node.right, leftValue);
 
     return new Types.GLOVoid();
   }

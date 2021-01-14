@@ -37,6 +37,7 @@ interface PseudoglossaASTVisitorWithDefault<T = unknown> {
   visitSwap?(node: AST.SwapAST): T;
   visitAlgorithm?(node: AST.AlgorithmAST): T;
   visitNumberConstant?(node: AST.NumberConstantAST): T;
+  visitFunctionCall(node: AST.FunctionCallAST): T;
 
   visitInteger(node: AST.IntegerAST): never;
   visitProcedureDeclaration(node: AST.ProcedureDeclarationAST): never;
@@ -44,7 +45,6 @@ interface PseudoglossaASTVisitorWithDefault<T = unknown> {
   visitReal(node: AST.RealAST): never;
   visitVariableDeclaration(node: AST.VariableDeclarationAST): never;
   visitString(node: AST.StringAST): never;
-  visitFunctionCall(node: AST.FunctionCallAST): never;
   visitProcedureCall(node: AST.ProcedureCallAST): never;
   visitBoolean(node: AST.BooleanAST): never;
   visitFunctionDeclaration(node: AST.FunctionDeclarationAST): never;
@@ -147,6 +147,8 @@ abstract class PseudoglossaASTVisitorWithDefault<T = unknown> {
       this.visitNumberConstant
     ) {
       return this.visitNumberConstant(node);
+    } else if (node instanceof AST.FunctionCallAST && this.visitFunctionCall) {
+      return this.visitFunctionCall(node);
     } else {
       return this.defaultVisit(node);
     }

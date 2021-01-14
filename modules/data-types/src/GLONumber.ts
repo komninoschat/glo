@@ -5,20 +5,47 @@ import GLODataType from './GLODataType';
  */
 export default class GLONumber extends GLODataType {
   public static readonly PRECISION = 2;
-  public internalValue: string;
+  private internalValue: string;
 
   public isInteger() {
-    return Number.isInteger(this.value);
+    return Number.isInteger(parseFloat(this.internalValue));
   }
 
-  public get value() {
+  private get floatValue() {
     return parseFloat(this.internalValue);
   }
 
+  private get integerValue() {
+    return parseInt(this.internalValue);
+  }
+
+  public get value() {
+    return this.isPositiveInfinity
+      ? Infinity
+      : this.isNegativeInfinity
+      ? -Infinity
+      : this.isInteger()
+      ? this.integerValue
+      : this.floatValue;
+  }
+
+  public isPositiveInfinity = false;
+  public isNegativeInfinity = false;
+
   constructor(value: number) {
     super();
+
+    if (value === Number.POSITIVE_INFINITY) {
+      this.isPositiveInfinity = true;
+      this.internalValue = '';
+    } else if (value === Number.NEGATIVE_INFINITY) {
+      this.isNegativeInfinity = true;
+      this.internalValue = '';
+    }
+
     // Hack to avoid toFixed rounding: Add one more digit and remove after string conversion
-    this.internalValue = value.toFixed(GLONumber.PRECISION + 1).slice(0, -1);
+    else
+      this.internalValue = value.toFixed(GLONumber.PRECISION + 1).slice(0, -1);
   }
 
   public serialize() {
@@ -26,7 +53,7 @@ export default class GLONumber extends GLODataType {
   }
 
   public print(): string {
-    return this.internalValue;
+    return this.value.toString();
   }
 
   public add(right: GLONumber): GLONumber {

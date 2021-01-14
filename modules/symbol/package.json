@@ -33,7 +33,8 @@
     "@glossa-glo/ast": "^4.1.1-beta",
     "@glossa-glo/case-insensitive-map": "^4.1.1-beta",
     "@glossa-glo/data-types": "^4.1.1-beta",
-    "@glossa-glo/error": "^4.1.1-beta"
+    "@glossa-glo/error": "^4.1.1-beta",
+    "typescript": "3.9"
   },
   "devDependencies": {
     "@types/chai": "^4.2.0",

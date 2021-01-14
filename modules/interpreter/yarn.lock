@@ -93,42 +93,42 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
-"@glossa-glo/ast@^4.0.1-beta":
-  version "4.0.1-beta"
-  resolved "https://registry.yarnpkg.com/@glossa-glo/ast/-/ast-4.0.1-beta.tgz#63a20fbd411219a174ac244a4887852070d73831"
-  integrity sha512-itT4dfGxk/f+VIOxBefxPs/SKEGLkwhlZy4Z/NCAMVwk3J1EUk6PT7HJM5UEb8SI0dDw5LccRZhjpwtZbCfigQ==
+"@glossa-glo/ast@^4.1.1-beta":
+  version "4.1.1-beta"
+  resolved "https://registry.yarnpkg.com/@glossa-glo/ast/-/ast-4.1.1-beta.tgz#40f579cca2013078ed270df3ea93fd5e05190da9"
+  integrity sha512-AD0wtA4CZs3Vcg67k1a1RFeXLK6E6nw6gAHj4ogJRhmjACQ5kjy9ScRu5ObhvCaAQW4zp2i8salKxwZYwCQvGQ==
   dependencies:
-    "@glossa-glo/data-types" "^3.0.0-beta"
-    "@glossa-glo/error" "^1.0.2-beta"
+    "@glossa-glo/data-types" "^4.1.1-beta"
+    "@glossa-glo/error" "^4.1.1-beta"
 
-"@glossa-glo/case-insensitive-map@^1.4.0-beta":
-  version "1.4.0-beta"
-  resolved "https://registry.yarnpkg.com/@glossa-glo/case-insensitive-map/-/case-insensitive-map-1.4.0-beta.tgz#c94f71358cb1423d63debd44a77bd006ceb0b6a5"
-  integrity sha512-FZSTPSEOC7ujm1KHyXCXw9L4MqMa6jsAx2Wbu7ZJyGGlsHcpO0YAMqtu500y7WdAROZNELZ54vyTk4V8X9+j9A==
+"@glossa-glo/case-insensitive-map@^4.1.1-beta":
+  version "4.1.1-beta"
+  resolved "https://registry.yarnpkg.com/@glossa-glo/case-insensitive-map/-/case-insensitive-map-4.1.1-beta.tgz#d574c89a275434280800b38d96f122c6e273471d"
+  integrity sha512-9FovVIqphsIPvhBygnuNqm5ZkYYICzXYjhouz7XO8XDvVG4P/oYQ2pGLPtyj8q2d5BDopkf6ANsb6HQOUy+F5Q==
 
-"@glossa-glo/data-types@^3.0.0-beta":
-  version "3.0.0-beta"
-  resolved "https://registry.yarnpkg.com/@glossa-glo/data-types/-/data-types-3.0.0-beta.tgz#94e17fb5c55a9d11a412bb72e23c88a4080b8447"
-  integrity sha512-pPlGrsxiLA3PlKzmzPtuegZNHRpec9sEvQXJyAQHIP+YxYHNbN1EJSuORyxw/fPdbfwgtaAv/vwoinY7uof2WA==
+"@glossa-glo/data-types@^4.1.1-beta":
+  version "4.1.1-beta"
+  resolved "https://registry.yarnpkg.com/@glossa-glo/data-types/-/data-types-4.1.1-beta.tgz#db0c0e921e75e3768294540e2f2e7434a28c51e5"
+  integrity sha512-P86GSF7UTLLjNTY3oM/Igyr90LnoThizfLEIGIJJxlJ5Mr1GfFgpycMM7S70Sw6dioOnGCPPRVIwsZyZCTDlnA==
   dependencies:
-    "@glossa-glo/error" "^1.0.2-beta"
+    "@glossa-glo/error" "^4.1.1-beta"
 
-"@glossa-glo/error@^1.0.2-beta":
-  version "1.0.2-beta"
-  resolved "https://registry.yarnpkg.com/@glossa-glo/error/-/error-1.0.2-beta.tgz#76fbee484cac841ad7423bf38feed81cf3fa1d9d"
-  integrity sha512-BR9/21AtIucDWlB8GdPtwbchyQ7PvSNeeXfuesucIQdWmss+gnZLtk3yapLLBhCegnzEmwyPvNBybf0XGmxOZw==
+"@glossa-glo/error@^4.1.1-beta":
+  version "4.1.1-beta"
+  resolved "https://registry.yarnpkg.com/@glossa-glo/error/-/error-4.1.1-beta.tgz#b358d9b40c7581acedd70358fd787d420328a184"
+  integrity sha512-bFSjfgcgem//PZSZQiGB7eSMikXCbTCHqgBM8s19G5OHcVqrzHJr20Lw5uRf6uUp1Wxwjf1AphTwMpExo8hFoA==
   dependencies:
     deep-equal "^2.0.3"
 
-"@glossa-glo/symbol@^4.0.1-beta":
-  version "4.0.1-beta"
-  resolved "https://registry.yarnpkg.com/@glossa-glo/symbol/-/symbol-4.0.1-beta.tgz#f1302ec96c1817247a2b0c437febef3d162e723d"
-  integrity sha512-QT8IgJptXmFhEf6RzPeNxOlL8EnHJ8rCCPLdqYSTBx2KSSn0ODALpcbO8ZEaVGcqpofV/qXrnoAHr3u5g33oHQ==
+"@glossa-glo/symbol@^4.1.1-beta":
+  version "4.1.1-beta"
+  resolved "https://registry.yarnpkg.com/@glossa-glo/symbol/-/symbol-4.1.1-beta.tgz#5a2525a8f4b0b33efa2584005977ff08d60463b5"
+  integrity sha512-iszPqqC3rgThdZpAzPa6glF4cbxzSwXcrKxzwqLKqUjATny0KtYpcsvI5lshkmdE6X12qesgLejeMy1J2RDQYg==
   dependencies:
-    "@glossa-glo/ast" "^4.0.1-beta"
-    "@glossa-glo/case-insensitive-map" "^1.4.0-beta"
-    "@glossa-glo/data-types" "^3.0.0-beta"
-    "@glossa-glo/error" "^1.0.2-beta"
+    "@glossa-glo/ast" "^4.1.1-beta"
+    "@glossa-glo/case-insensitive-map" "^4.1.1-beta"
+    "@glossa-glo/data-types" "^4.1.1-beta"
+    "@glossa-glo/error" "^4.1.1-beta"
 
 "@types/chai@^4.2.0":
   version "4.2.14"
@@ -1543,6 +1543,11 @@ type-detect@^4.0.0, type-detect@^4.0.5:
   version "4.0.8"
   resolved "https://registry.yarnpkg.com/type-detect/-/type-detect-4.0.8.tgz#7646fb5f18871cfbb7749e69bd39a6388eb7450c"
   integrity sha512-0fr/mIH1dlO+x7TlcMy+bIDqKPsw/70tVyeHW787goQjhmqaZe10uwLujubK9q9Lg6Fiho1KUKDYz0Z7k7g5/g==
+
+typescript@3.9:
+  version "3.9.7"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.7.tgz#98d600a5ebdc38f40cb277522f12dc800e9e25fa"
+  integrity sha512-BLbiRkiBzAwsjut4x/dsibSTB6yWpwT5qWmC2OfuCg3GgVQCSgMs4vEctYPhsaGtd0AeuuHMkjZ2h2WG8MSzRw==
 
 uuid@^3.3.2:
   version "3.4.0"

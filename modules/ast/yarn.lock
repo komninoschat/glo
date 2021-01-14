@@ -93,17 +93,17 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
-"@glossa-glo/data-types@^3.0.0-beta":
-  version "3.0.0-beta"
-  resolved "https://registry.yarnpkg.com/@glossa-glo/data-types/-/data-types-3.0.0-beta.tgz#94e17fb5c55a9d11a412bb72e23c88a4080b8447"
-  integrity sha512-pPlGrsxiLA3PlKzmzPtuegZNHRpec9sEvQXJyAQHIP+YxYHNbN1EJSuORyxw/fPdbfwgtaAv/vwoinY7uof2WA==
+"@glossa-glo/data-types@^4.1.1-beta":
+  version "4.1.1-beta"
+  resolved "https://registry.yarnpkg.com/@glossa-glo/data-types/-/data-types-4.1.1-beta.tgz#db0c0e921e75e3768294540e2f2e7434a28c51e5"
+  integrity sha512-P86GSF7UTLLjNTY3oM/Igyr90LnoThizfLEIGIJJxlJ5Mr1GfFgpycMM7S70Sw6dioOnGCPPRVIwsZyZCTDlnA==
   dependencies:
-    "@glossa-glo/error" "^1.0.2-beta"
+    "@glossa-glo/error" "^4.1.1-beta"
 
-"@glossa-glo/error@^1.0.2-beta":
-  version "1.0.2-beta"
-  resolved "https://registry.yarnpkg.com/@glossa-glo/error/-/error-1.0.2-beta.tgz#76fbee484cac841ad7423bf38feed81cf3fa1d9d"
-  integrity sha512-BR9/21AtIucDWlB8GdPtwbchyQ7PvSNeeXfuesucIQdWmss+gnZLtk3yapLLBhCegnzEmwyPvNBybf0XGmxOZw==
+"@glossa-glo/error@^4.1.1-beta":
+  version "4.1.1-beta"
+  resolved "https://registry.yarnpkg.com/@glossa-glo/error/-/error-4.1.1-beta.tgz#b358d9b40c7581acedd70358fd787d420328a184"
+  integrity sha512-bFSjfgcgem//PZSZQiGB7eSMikXCbTCHqgBM8s19G5OHcVqrzHJr20Lw5uRf6uUp1Wxwjf1AphTwMpExo8hFoA==
   dependencies:
     deep-equal "^2.0.3"
 
@@ -1482,6 +1482,11 @@ type-detect@^4.0.0, type-detect@^4.0.5:
   version "4.0.8"
   resolved "https://registry.yarnpkg.com/type-detect/-/type-detect-4.0.8.tgz#7646fb5f18871cfbb7749e69bd39a6388eb7450c"
   integrity sha512-0fr/mIH1dlO+x7TlcMy+bIDqKPsw/70tVyeHW787goQjhmqaZe10uwLujubK9q9Lg6Fiho1KUKDYz0Z7k7g5/g==
+
+typescript@3.9:
+  version "3.9.7"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.7.tgz#98d600a5ebdc38f40cb277522f12dc800e9e25fa"
+  integrity sha512-BLbiRkiBzAwsjut4x/dsibSTB6yWpwT5qWmC2OfuCg3GgVQCSgMs4vEctYPhsaGtd0AeuuHMkjZ2h2WG8MSzRw==
 
 uuid@^3.3.2:
   version "3.4.0"

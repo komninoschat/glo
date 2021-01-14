@@ -8,7 +8,6 @@ interface PseudoglossaASTVisitor {
   visitReal(node: AST.RealAST): never;
   visitVariableDeclaration(node: AST.VariableDeclarationAST): never;
   visitString(node: AST.StringAST): never;
-  visitFunctionCall(node: AST.FunctionCallAST): never;
   visitProcedureCall(node: AST.ProcedureCallAST): never;
   visitBoolean(node: AST.BooleanAST): never;
   visitFunctionDeclaration(node: AST.FunctionDeclarationAST): never;
@@ -54,6 +53,7 @@ abstract class PseudoglossaASTVisitor<T = unknown> {
   public abstract visitSwap(node: AST.SwapAST): T;
   public abstract visitAlgorithm(node: AST.AlgorithmAST): T;
   public abstract visitNumberConstant(node: AST.NumberConstantAST): T;
+  public abstract visitFunctionCall(node: AST.FunctionCallAST): T;
 
   public visit(node: AST.AST): T {
     if (node instanceof AST.AssignmentAST) {
@@ -128,6 +128,8 @@ abstract class PseudoglossaASTVisitor<T = unknown> {
       return this.visitAlgorithm(node);
     } else if (node instanceof AST.NumberConstantAST) {
       return this.visitNumberConstant(node);
+    } else if (node instanceof AST.FunctionCallAST) {
+      return this.visitFunctionCall(node);
     } else {
       throw new GLOError(
         node,

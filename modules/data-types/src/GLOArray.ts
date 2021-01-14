@@ -34,22 +34,33 @@ export default function createGLOArray(
     // TODO: Make more efficient, allow n-dimensional arrays
     arrayPrint() {
       if (this.dimensionLength.length === 1) {
-        const arr = new Array(this.dimensionLength[0] + 1);
-        for (let i = 1; i <= this.dimensionLength[0]; i++) {
-          if (this.value[i] instanceof GLODataType) {
-            arr[i] = this.value[i].print();
+        let arr;
+        if (this.dimensionLength[0] !== Number.POSITIVE_INFINITY) {
+          arr = new Array(this.dimensionLength[0] + 1);
+          for (let i = 1; i <= this.dimensionLength[0]; i++) {
+            if (this.value[i] instanceof GLODataType) {
+              arr[i] = this.value[i].print();
+            }
           }
+        } else {
+          // const maxIndex = Object.keys(this.value)
+          arr = [];
         }
         return arr;
       } else if (this.dimensionLength.length === 2) {
-        const arr = new Array(this.dimensionLength[0] + 1);
-        for (let i = 1; i <= this.dimensionLength[0]; i++) {
-          arr[i] = new Array(this.dimensionLength[1] + 1);
-          for (let j = 1; j <= this.dimensionLength[1]; j++) {
-            if (this.value[i] && this.value[i][j] instanceof GLODataType) {
-              arr[i][j] = this.value[i][j].print();
+        let arr;
+        if (this.dimensionLength[0] !== Number.POSITIVE_INFINITY) {
+          arr = new Array(this.dimensionLength[0] + 1);
+          for (let i = 1; i <= this.dimensionLength[0]; i++) {
+            arr[i] = new Array(this.dimensionLength[1] + 1);
+            for (let j = 1; j <= this.dimensionLength[1]; j++) {
+              if (this.value[i] && this.value[i][j] instanceof GLODataType) {
+                arr[i][j] = this.value[i][j].print();
+              }
             }
           }
+        } else {
+          arr = [];
         }
         return arr;
       } else {
