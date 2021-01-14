@@ -7,6 +7,7 @@ import {
   LocalSymbolScope,
   VariableSymbol,
   SymbolScopeType,
+  AlgorithmSymbol,
 } from '@glossa-glo/symbol';
 import GLOError, {
   assertEquality,
@@ -64,6 +65,18 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
   public async visitAssignment(node: AST.AssignmentAST) {
     const left = node.left;
     const newValue = await this.visit(node.right);
+
+    const leftSymbol = this.scope.resolve(
+      left instanceof AST.VariableAST ? left.name : left.array.name,
+    )!;
+    if (!(leftSymbol instanceof VariableSymbol)) {
+      throw new GLOError(
+        node,
+        `Το σύμβολο ${
+          left instanceof AST.VariableAST ? left.name : left.array.name
+        } έχει χρησιμοποιηθεί ήδη ως ${leftSymbol.print()}.`,
+      );
+    }
 
     if (left instanceof AST.VariableAST) {
       if (!this.scope.resolve(left.name))
@@ -488,6 +501,7 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
     await this.withNewScope(
       node.name,
       async () => {
+        this.scope.insert(new AlgorithmSymbol(node.name));
         await this.visitMultipleInOrder(node.children);
       },
       SymbolScopeType.Algorithm,
@@ -835,6 +849,14 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
 
       const expectedType = variableTypes[i];
       const name = argNames[i];
+
+      const leftSymbol = this.scope.resolve(name)!;
+      if (!(leftSymbol instanceof VariableSymbol)) {
+        throw new GLOError(
+          argNode,
+          `Το σύμβολο ${name} έχει χρησιμοποιηθεί ήδη ως ${leftSymbol.print()}.`,
+        );
+      }
 
       const reading = await this.options.read(argNode);
 
