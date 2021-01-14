@@ -619,7 +619,7 @@ export default class InterpreterPage extends Vue {
       this.fontSize = '16px';
     }
 
-    if(window.location.href.indexOf('sub') !== -1) {
+    if(window.location.href.indexOf('pseudo') !== -1) {
       this.isPseudoglossa = true;
     }
 
