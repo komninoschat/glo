@@ -158,19 +158,27 @@ export default abstract class SymbolScope {
       if (v instanceof VariableSymbol) {
         const value = this.resolveValue(k);
 
-        variableOrConstantList.push({
-          name: this.scope.originalKey.get(k)!,
-          type: v.type.isArrayType ? 'Πίνακας' : printType(v.type),
-          value: value
-            ? !v.type.isArrayType
-              ? value.print()
-              : (value as any).arrayPrint()
-            : undefined,
-          isConstant: v.isConstant,
-          dimensionLength: v.type.isArrayType
-            ? (value as any).dimensionLength
-            : undefined,
-        });
+        if (!v.type.isArrayType)
+          variableOrConstantList.push({
+            name: this.scope.originalKey.get(k)!,
+            type: printType(v.type),
+            value: value ? value.print() : undefined,
+            isConstant: v.isConstant,
+            dimensionLength: undefined,
+          });
+        else {
+          const { print, dimensionLength } = value
+            ? (value as any).arrayPrint()
+            : { print: undefined, dimensionLength: undefined };
+
+          variableOrConstantList.push({
+            name: this.scope.originalKey.get(k)!,
+            type: 'Πίνακας',
+            value: print,
+            isConstant: v.isConstant,
+            dimensionLength,
+          });
+        }
       }
     }
 

@@ -22,7 +22,7 @@
     "url": "git+https://github.com/komninoschat/glo.git"
   },
   "scripts": {
-    "prepare": "tsc -p tsconfig.json",
+    "prepare": "tsc",
     "test": "cross-env NODE_ENV=development mocha \"./__tests__/**/*.test.ts\" --opts=__tests__/mocha.opts",
     "test-cover": "cross-env NODE_ENV=development nyc mocha \"./__tests__/**/*.test.ts\" -- --opts=__tests__/mocha.opts"
   },

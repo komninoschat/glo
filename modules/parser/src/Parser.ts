@@ -148,7 +148,7 @@ export class Parser {
 
       step = this.expression();
     }
-    å;
+
     this.nl('Περίμενα νέα γραμμή μετά από κεφάλι επανάληψης');
 
     const statementList = this.statementList();
