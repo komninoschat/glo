@@ -69,8 +69,8 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
 
     const leftSymbol = this.scope.resolve(
       left instanceof AST.VariableAST ? left.name : left.array.name,
-    )!;
-    if (!(leftSymbol instanceof VariableSymbol)) {
+    );
+    if (leftSymbol && !(leftSymbol instanceof VariableSymbol)) {
       throw new GLOError(
         node.left,
         `Το σύμβολο ${
@@ -639,7 +639,7 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
         ? node.counter.name
         : node.counter.array.name,
     )!;
-    if (!(counterSymbol instanceof VariableSymbol)) {
+    if (counterSymbol && !(counterSymbol instanceof VariableSymbol)) {
       throw new GLOError(
         node.counter,
         `Το σύμβολο ${
@@ -650,7 +650,9 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
       );
     }
 
-    const counterType = counterSymbol.type;
+    const counterType = counterSymbol.type.isArrayType
+      ? (counterSymbol.type as any).componentType
+      : counterSymbol.type;
     assertEquality(
       node.counter,
       counterType,
@@ -658,7 +660,7 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
       `Περίμενα τον μετρητή επανάληψης να είναι τύπου ${Types.printType(
         Types.GLONumber,
       )}, αλλά έλαβα μη συμβατό τύπο ${Types.printType(
-        counterType.constructor as typeof Types.GLODataType,
+        counterType as typeof Types.GLODataType,
       )}`,
     );
 
@@ -896,8 +898,8 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
       const expectedType = variableTypes[i];
       const name = argNames[i];
 
-      const leftSymbol = this.scope.resolve(name)!;
-      if (!(leftSymbol instanceof VariableSymbol)) {
+      const leftSymbol = this.scope.resolve(name);
+      if (leftSymbol && !(leftSymbol instanceof VariableSymbol)) {
         throw new GLOError(
           argNode,
           `Το σύμβολο ${name} έχει χρησιμοποιηθεί ήδη ως ${leftSymbol.print()}.`,
