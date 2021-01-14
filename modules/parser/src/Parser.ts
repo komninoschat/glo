@@ -141,7 +141,10 @@ export class Parser {
 
     const endValue = this.expression();
 
-    let step: AST.AST = new AST.IntegerConstantAST(new Types.GLOInteger(1));
+    let step: AST.AST =
+      this.lexer.mode === Lexer.Mode.Glossa
+        ? new AST.IntegerConstantAST(new Types.GLOInteger(1))
+        : new AST.NumberConstantAST(new Types.GLONumber(1));
 
     if (this.currentToken instanceof Lexer.WithStepToken) {
       this.currentToken = this.eat(Lexer.WithStepToken);

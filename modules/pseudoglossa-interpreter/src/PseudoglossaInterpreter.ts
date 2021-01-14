@@ -1,3 +1,4 @@
+// TODO: Code here is very messy and repetitive
 import * as Types from '@glossa-glo/data-types';
 import { assertInstanceTypeEquality } from '@glossa-glo/data-types';
 import * as AST from '@glossa-glo/ast';
@@ -604,10 +605,55 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
   }
 
   public async visitFor(node: AST.ForAST) {
-    const counterType = this.visit(node.counter);
+    if (node.counter instanceof AST.VariableAST) {
+      if (!this.scope.resolve(node.counter.name))
+        this.scope.insert(
+          new VariableSymbol(
+            node.counter.name,
+            Types.GLONumber,
+            false,
+          ).inheritPositionFrom(node.counter),
+        );
+    } else if (node.counter instanceof AST.ArrayAccessAST) {
+      if (!this.scope.resolve(node.counter.array.name)) {
+        const arrayConstructor = Types.createGLOArray(
+          Types.GLONumber,
+          Array(node.counter.accessors.length).fill(Infinity),
+        );
+        this.scope.insert(
+          new VariableSymbol(
+            node.counter.array.name,
+            arrayConstructor,
+            false,
+            new Array(node.counter.accessors.length).fill(
+              new AST.NumberConstantAST(new Types.GLONumber(Infinity)),
+            ),
+          ).inheritPositionFrom(node.counter),
+        );
+        this.scope.changeValue(node.counter.array.name, new arrayConstructor());
+      }
+    }
+
+    const counterSymbol = this.scope.resolve(
+      node.counter instanceof AST.VariableAST
+        ? node.counter.name
+        : node.counter.array.name,
+    )!;
+    if (!(counterSymbol instanceof VariableSymbol)) {
+      throw new GLOError(
+        node.counter,
+        `Το σύμβολο ${
+          node.counter instanceof AST.VariableAST
+            ? node.counter.name
+            : node.counter.array.name
+        } έχει χρησιμοποιηθεί ήδη ως ${counterSymbol.print()}.`,
+      );
+    }
+
+    const counterType = counterSymbol.type;
     assertEquality(
       node.counter,
-      counterType.constructor,
+      counterType,
       Types.GLONumber,
       `Περίμενα τον μετρητή επανάληψης να είναι τύπου ${Types.printType(
         Types.GLONumber,
@@ -616,7 +662,7 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
       )}`,
     );
 
-    const startValueType = this.visit(node.startValue);
+    const startValueType = await this.visit(node.startValue);
     assertEquality(
       node.startValue,
       startValueType.constructor,
@@ -628,7 +674,7 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
       )}`,
     );
 
-    const endValueType = this.visit(node.endValue);
+    const endValueType = await this.visit(node.endValue);
     assertEquality(
       node.endValue,
       endValueType.constructor,
@@ -640,7 +686,7 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
       )}`,
     );
 
-    const stepType = this.visit(node.step);
+    const stepType = await this.visit(node.step);
     assertEquality(
       node.step,
       stepType.constructor,
@@ -688,7 +734,7 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
   }
 
   public async visitWhile(node: AST.WhileAST) {
-    const conditionType = this.visit(node.condition);
+    const conditionType = await this.visit(node.condition);
     assertEquality(
       node.condition,
       conditionType.constructor,
@@ -707,7 +753,7 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
   }
 
   public async visitRepeat(node: AST.RepeatAST) {
-    const conditionType = this.visit(node.condition);
+    const conditionType = await this.visit(node.condition);
     assertEquality(
       node.condition,
       conditionType.constructor,

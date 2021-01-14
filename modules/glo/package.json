@@ -1,6 +1,6 @@
 {
   "name": "@glossa-glo/glo",
-  "version": "4.2.2-beta",
+  "version": "4.2.4-beta",
   "description": "Glo library",
   "author": "komninoschat <komninoschat@gmail.com>",
   "homepage": "https://github.com/komninoschat/glo#readme",
@@ -35,7 +35,7 @@
     "@glossa-glo/interpreter": "^4.2.2-beta",
     "@glossa-glo/lexer": "^4.2.0-beta",
     "@glossa-glo/library-glossa": "^4.2.2-beta",
-    "@glossa-glo/parser": "^4.2.0-beta",
+    "@glossa-glo/parser": "^4.2.4-beta",
     "@glossa-glo/semantic-analyzer": "^4.2.2-beta",
     "@glossa-glo/symbol": "^4.2.2-beta"
   },
