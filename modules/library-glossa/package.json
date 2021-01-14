@@ -1,6 +1,6 @@
 {
   "name": "@glossa-glo/library-glossa",
-  "version": "4.1.1-beta",
+  "version": "4.2.0-beta",
   "description": "GLO Glossa library",
   "author": "komninoschat <komninoschat@gmail.com>",
   "homepage": "https://github.com/komninoschat/glo#readme",
@@ -40,9 +40,9 @@
     "ts-node": "^8.3.0"
   },
   "dependencies": {
-    "@glossa-glo/data-types": "^4.1.1-beta",
-    "@glossa-glo/error": "^4.1.1-beta",
-    "@glossa-glo/library": "^4.1.1-beta",
-    "@glossa-glo/symbol": "^4.1.1-beta"
+    "@glossa-glo/data-types": "^4.2.0-beta",
+    "@glossa-glo/error": "^4.2.0-beta",
+    "@glossa-glo/library": "^4.2.0-beta",
+    "@glossa-glo/symbol": "^4.2.0-beta"
   }
 }

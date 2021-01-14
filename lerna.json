@@ -2,6 +2,6 @@
   "packages": [
     "modules/*"
   ],
-  "version": "4.1.1-beta",
+  "version": "4.2.0-beta",
   "npmClient": "yarn"
 }
