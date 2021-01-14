@@ -9,9 +9,23 @@
       "request": "launch",
       "name": "test.glo",
       "program": "${workspaceFolder}/modules/cli/bin/run",
-      // "preLaunchTask": "lerna bootstrap",
+      "sourceMaps": true,
+      "outFiles": ["${workspaceFolder}/modules/*/lib/**/*.js"],
+      "trace": true,
       "args": [
         "test.glo"
+      ],
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "test.ps",
+      "program": "${workspaceFolder}/modules/cli/bin/run",
+      "sourceMaps": true,
+      "outFiles": ["${workspaceFolder}/modules/*/lib/**/*.js"],
+      "args": [
+        "--pseudo",
+        "test.ps"
       ],
     }
   ]

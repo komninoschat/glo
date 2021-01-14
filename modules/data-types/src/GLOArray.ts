@@ -33,25 +33,75 @@ export default function createGLOArray(
     // can be written with the write command
     // TODO: Make more efficient, allow n-dimensional arrays
     arrayPrint() {
+      function flatten<T>(arr: any[]): T {
+        return arr.reduce(function(flat, toFlatten) {
+          return flat.concat(
+            Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten,
+          );
+        }, []);
+      }
+
       if (this.dimensionLength.length === 1) {
-        const arr = new Array(this.dimensionLength[0] + 1);
-        for (let i = 1; i <= this.dimensionLength[0]; i++) {
-          if (this.value[i] instanceof GLODataType) {
-            arr[i] = this.value[i].print();
-          }
-        }
-        return arr;
-      } else if (this.dimensionLength.length === 2) {
-        const arr = new Array(this.dimensionLength[0] + 1);
-        for (let i = 1; i <= this.dimensionLength[0]; i++) {
-          arr[i] = new Array(this.dimensionLength[1] + 1);
-          for (let j = 1; j <= this.dimensionLength[1]; j++) {
-            if (this.value[i] && this.value[i][j] instanceof GLODataType) {
-              arr[i][j] = this.value[i][j].print();
+        let arr;
+        if (this.dimensionLength[0] !== Number.POSITIVE_INFINITY) {
+          arr = new Array(this.dimensionLength[0] + 1);
+          for (let i = 1; i <= this.dimensionLength[0]; i++) {
+            if (this.value[i] instanceof GLODataType) {
+              arr[i] = this.value[i].print();
             }
           }
+          return { print: arr, dimensionLength: this.dimensionLength };
+        } else {
+          const maxIndex = Math.max(
+            ...Object.keys(this.value).map(key => parseInt(key)),
+            1,
+          );
+          arr = new Array(maxIndex);
+          for (let i = 1; i <= maxIndex; i++) {
+            if (this.value[i] instanceof GLODataType) {
+              arr[i] = this.value[i].print();
+            }
+          }
+          return { print: arr, dimensionLength: [maxIndex] };
         }
-        return arr;
+      } else if (this.dimensionLength.length === 2) {
+        let arr;
+        if (this.dimensionLength[0] !== Number.POSITIVE_INFINITY) {
+          arr = new Array(this.dimensionLength[0] + 1);
+          for (let i = 1; i <= this.dimensionLength[0]; i++) {
+            arr[i] = new Array(this.dimensionLength[1] + 1);
+            for (let j = 1; j <= this.dimensionLength[1]; j++) {
+              if (this.value[i] && this.value[i][j] instanceof GLODataType) {
+                arr[i][j] = this.value[i][j].print();
+              }
+            }
+          }
+          return { print: arr, dimensionLength: this.dimensionLength };
+        } else {
+          const maxIndex = Math.max(
+            ...Object.keys(this.value).map(key => parseInt(key)),
+            1,
+          );
+          const maxIndex2 = Math.max(
+            ...flatten<number[]>(
+              Object.values<any>(this.value).map(val =>
+                Object.keys(val).map(key => parseInt(key)),
+              ),
+            ),
+            1,
+          );
+
+          arr = new Array(maxIndex);
+          for (let i = 1; i <= maxIndex; i++) {
+            arr[i] = new Array(maxIndex2);
+            for (let j = 1; j <= maxIndex2; j++) {
+              if (this.value[i] && this.value[i][j] instanceof GLODataType) {
+                arr[i][j] = this.value[i][j].print();
+              }
+            }
+          }
+          return { print: arr, dimensionLength: [maxIndex, maxIndex2] };
+        }
       } else {
         return [];
       }

@@ -110,8 +110,6 @@ CodeMirror.defineMode('glossa', function() {
       if (style == 'comment' || style == 'meta') return style;
       return style;
     },
-
-    // electricChars: "{}"
   };
 });
 

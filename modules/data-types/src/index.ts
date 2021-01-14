@@ -13,7 +13,11 @@ import createGLOMultitype from './GLOMultitype';
 import GLOFunction from './GLOFunction';
 import GLOSubrange from './GLOSubrange';
 import { canBeRead, canBeWritten } from './canBeUsedInIO';
-import assertTypeEquality from './assertTypeEquality';
+import {
+  assertTypeEquality,
+  assertInstanceTypeEquality,
+} from './assertTypeEquality';
+import GLONumber from './GLONumber';
 
 export {
   GLOInteger,
@@ -35,4 +39,6 @@ export {
   canBeRead,
   canBeWritten,
   assertTypeEquality,
+  assertInstanceTypeEquality,
+  GLONumber,
 };

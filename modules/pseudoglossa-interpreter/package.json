@@ -1,0 +1,51 @@
+{
+  "name": "@glossa-glo/pseudoglossa-interpreter",
+  "version": "4.2.0-beta",
+  "description": "GLO pseudoglossa interpreter",
+  "author": "komninoschat <komninoschat@gmail.com>",
+  "homepage": "https://github.com/komninoschat/glo#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "main": "lib/PseudoglossaInterpreter.js",
+  "typings": "lib/PseudoglossaInterpreter.d.ts",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/komninoschat/glo.git"
+  },
+  "scripts": {
+    "prepare": "tsc",
+    "test": "cross-env NODE_ENV=development mocha \"./__tests__/**/*.test.ts\" --opts=__tests__/mocha.opts",
+    "test-cover": "cross-env NODE_ENV=development nyc mocha \"./__tests__/**/*.test.ts\" -- --opts=__tests__/mocha.opts"
+  },
+  "bugs": {
+    "url": "https://github.com/komninoschat/glo/issues"
+  },
+  "dependencies": {
+    "@glossa-glo/ast": "^4.2.0-beta",
+    "@glossa-glo/case-insensitive-map": "^4.2.0-beta",
+    "@glossa-glo/data-types": "^4.2.0-beta",
+    "@glossa-glo/error": "^4.2.0-beta",
+    "@glossa-glo/symbol": "^4.2.0-beta",
+    "typescript": "3.9"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.0",
+    "@types/clone-deep": "^4.0.1",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.7.2",
+    "chai": "^4.2.0",
+    "cross-env": "^5.2.0",
+    "mocha": "^6.2.0",
+    "nyc": "^14.1.1",
+    "ts-node": "^8.3.0"
+  }
+}

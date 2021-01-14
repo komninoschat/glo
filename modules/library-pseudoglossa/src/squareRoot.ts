@@ -1,12 +1,12 @@
-import { GLODataType, GLOReal } from '@glossa-glo/data-types';
+import { GLODataType, GLONumber } from '@glossa-glo/data-types';
 import GLOError from '@glossa-glo/error';
-import LibraryFunction from './LibraryFunction';
+import { LibraryFunction } from '@glossa-glo/library';
 
 export default new LibraryFunction(
   'Τ_Ρ',
-  [{ args: [['τιμή', GLOReal]], returnType: GLOReal }],
+  [{ args: [['τιμή', GLONumber]], returnType: GLONumber }],
   (args, argDebugInfoProviders) => {
-    const value = (args[0] as GLOReal).value;
+    const value = (args[0] as GLONumber).value;
 
     if (value < 0) {
       throw new GLOError(
@@ -15,6 +15,6 @@ export default new LibraryFunction(
       );
     }
 
-    return new GLOReal(Math.sqrt(value));
+    return new GLONumber(Math.sqrt(value));
   },
 );

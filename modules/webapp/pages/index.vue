@@ -8,6 +8,7 @@
       :darkmode="darkmode"
       :actionBeingPerformed="actionBeingPerformed"
       :lastStep="lastStep"
+      :isPseudoglossa="isPseudoglossa"
       @interpret="interpret"
       @stepInterpret="stepInterpret"
       @nextStep="nextStep"
@@ -44,9 +45,20 @@
       ) Κονσόλα εισόδου/εξόδου
       li(
         :style="{'min-height': fontSize}"
-        v-for="item in console"
-        v-html="item"
+        v-for="{type, message}) in console"
       )
+        div.info(
+          v-if="type === 'info'"
+        ) {{ message }}
+        div.read(
+          v-else-if="type === 'read'"
+        ) {{ message }}
+        div.error(
+          v-else-if="type === 'error'"
+        ) {{ message }}
+        div(
+          v-else
+        ) {{ message }}
       input.read-input(
         rf="readInput"
         v-model="read"
@@ -122,7 +134,6 @@ symbol-scope-width = 300px
   padding 10px 15px
   border 0
   font-family "Roboto Mono", monospace
-  // box-shadow 0px 0px 5px 0px rgba(65,65,65,0.5)
   border-top 1px solid rgba(65,65,65,0.5)
   line-height 1.25
   position relative
@@ -166,8 +177,8 @@ symbol-scope-width = 300px
 <script lang="ts">
 import 'reflect-metadata';
 import { Component, Vue } from 'nuxt-property-decorator';
-import gloInterpret, { Options as GloOptions} from '@glossa-glo/glo';
-import GLOError, { DebugInfoProviderLike } from '@glossa-glo/error';
+import { Options as InterpreterOptions} from '@glossa-glo/glo';
+import GLOError, { DebugInfoProvider } from '@glossa-glo/error';
 import { ArrayAccessAST, AST, ProgramAST } from '@glossa-glo/ast';
 
 import { CodeMirror, codemirror } from 'vue-codemirror';
@@ -178,6 +189,7 @@ import 'codemirror/addon/selection/active-line.js'
 import 'codemirror/addon/selection/mark-selection.js'
 
 import '../glossa.js'
+import '../pseudoglossa.js'
 
 import store from '../store';
 
@@ -214,7 +226,7 @@ export default class InterpreterPage extends Vue {
     }
   }
 
-  highlightError(debugInfoProvider: DebugInfoProviderLike) {
+  highlightError(debugInfoProvider: DebugInfoProvider) {
     this.clearError();
     const cm = this.$refs.editor.codemirror;
 
@@ -236,7 +248,7 @@ export default class InterpreterPage extends Vue {
     }
   }
 
-  highlightRead(debugInfoProvider: DebugInfoProviderLike) {
+  highlightRead(debugInfoProvider: DebugInfoProvider) {
     this.clearReadHighlight();
     const cm = this.$refs.editor.codemirror;
 
@@ -262,7 +274,10 @@ export default class InterpreterPage extends Vue {
   }
 
   sourceCode: string = '';
-  console: string[] = [];
+  console: {
+    type?: string,
+    message: string,
+  }[] = [];
   read = '';
   interpreting = false;
   stepInterpreting = false;
@@ -290,7 +305,7 @@ export default class InterpreterPage extends Vue {
       line: true,
       readOnly: this.actionBeingPerformed,
       theme: !this.darkmode ? 'eclipse' : 'darcula',
-      mode: 'text/x-glossa',
+      mode: this.lang,
       styleActiveLine: !this.isMobile,
       styleSelectedText: true
     }
@@ -314,20 +329,17 @@ export default class InterpreterPage extends Vue {
   }
 
   consoleNewLine(message: string, type?: 'program-error'|'error'|'info'|'read', line?: number) {
-    let str;
     if(!type) {
-      str = `<div>${message}</div>`
+      this.console.push({ message })
     } else if(type === 'info') {
-      str = `<div class="info">Ενημέρωση: ${message}</div>`;
+      this.console.push({ type: 'info', message })
     } else if(type === 'read') {
-      str = `<div class="read">${message}</div>`;
+      this.console.push({ type: 'read', message })
     } else if(type === 'error') {
-      str = `<div class="error">${line ? `Γραμμή ${line}: ` : ''}Σφάλμα: ${message}</div>`;
+      this.console.push({ type: 'error', message: `${line ? `Γραμμή ${line}: ` : ''}Σφάλμα: ${message}` })
     } else if(type === 'program-error') {
-      str = `<div class="error">Σφάλμα Διερμηνευτή: ${message}</div>`;
+      this.console.push({ type: 'error', message: `Σφάλμα Διερμηνευτή: ${message}` })
     }
-
-    this.console.push(str);
 
     setTimeout(() => {
       if(this.$refs.console) {
@@ -358,8 +370,8 @@ export default class InterpreterPage extends Vue {
     }
   }
 
-  async interpret(options?: Partial<GloOptions>, ignoreActionBeingPerformed = false) {
-    if (!ignoreActionBeingPerformed && this.actionBeingPerformed) return;
+  async interpret(options?: Partial<InterpreterOptions>, ignoreActionBeingPerformed = false) {
+    if (!ignoreActionBeingPerformed && this.actionBeingPerformed || !this.interpreter) return;
 
     this.clearError();
 
@@ -378,11 +390,11 @@ export default class InterpreterPage extends Vue {
     }
 
     try {
-      await gloInterpret(
+      await this.interpreter(
         addMissingTrailingNewline(this.sourceCode),
         {
           ...options,
-          read: (debugInfoProvider: DebugInfoProviderLike) => {
+          read: (debugInfoProvider: DebugInfoProvider) => {
             if(!store.inputFile) {
               this.highlightRead(debugInfoProvider);
               return new Promise((resolve,reject) => {
@@ -421,7 +433,6 @@ export default class InterpreterPage extends Vue {
       if (_error instanceof GLOError) {
         let error = _error as GLOError;
         const canEvalLine =
-          // error.start.linePosition === error.end.linePosition &&
           error.start.linePosition !== -1 &&
           error.start.characterPosition !== -1 &&
           error.end.characterPosition !== -1;
@@ -599,10 +610,27 @@ export default class InterpreterPage extends Vue {
   }
 
   isMobile: boolean = false;
-  created() {
+  isPseudoglossa: boolean = false;
+  interpreter: ((string, InterpreterOptions) => Promise<void>)|null = null;
+  lang = '';
+  async created() {
     this.isMobile = innerWidth <= 600;
     if(this.isMobile) {
       this.fontSize = '16px';
+    }
+
+    if(window.location.href.indexOf('sub') !== -1) {
+      this.isPseudoglossa = true;
+    }
+
+    if(!this.isPseudoglossa) {
+      document.title = 'GLO Διερμηνευτής της Γλώσσας';
+      this.interpreter = (await import('@glossa-glo/glo')).default;
+      this.lang = 'text/x-glossa';
+    } else {
+      document.title = 'PS Διερμηνευτής της Ψευδογλώσσας'
+      this.interpreter = (await import('@glossa-glo/ps')).default;
+      this.lang = 'text/x-pseudoglossa';
     }
   }
 

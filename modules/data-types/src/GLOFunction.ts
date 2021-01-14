@@ -1,5 +1,5 @@
 import { GLODataType } from '.';
-import { DebugInfoProviderLike } from '@glossa-glo/error';
+import { DebugInfoProvider } from '@glossa-glo/error';
 
 export default class GLOFunction extends GLODataType {
   public returnValue: GLODataType | null = null;
@@ -7,7 +7,7 @@ export default class GLOFunction extends GLODataType {
   constructor(
     public readonly call: (
       args: GLODataType[],
-      argDebugInfoProviders: DebugInfoProviderLike[],
+      argDebugInfoProviders: DebugInfoProvider[],
     ) => Promise<void>,
   ) {
     super();

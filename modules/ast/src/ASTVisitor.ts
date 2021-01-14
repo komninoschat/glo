@@ -50,6 +50,9 @@ abstract class ASTVisitor<T = unknown> {
   public abstract visitWrite(node: AST.WriteAST): T;
   public abstract visitExponentiation(node: AST.ExponentiationAST): T;
   public abstract visitConstantDeclaration(node: AST.ConstantDeclarationAST): T;
+  public abstract visitSwap(node: AST.SwapAST): T;
+  public abstract visitNumberConstant(node: AST.NumberConstantAST): T;
+  public abstract visitAlgorithm(node: AST.AlgorithmAST): T;
 
   public visit(node: AST.AST): T {
     if (node instanceof AST.AssignmentAST) {
@@ -144,6 +147,12 @@ abstract class ASTVisitor<T = unknown> {
       return this.visitExponentiation(node);
     } else if (node instanceof AST.ConstantDeclarationAST) {
       return this.visitConstantDeclaration(node);
+    } else if (node instanceof AST.SwapAST) {
+      return this.visitSwap(node);
+    } else if (node instanceof AST.NumberConstantAST) {
+      return this.visitNumberConstant(node);
+    } else if (node instanceof AST.AlgorithmAST) {
+      return this.visitAlgorithm(node);
     } else {
       throw new GLOError(
         node,

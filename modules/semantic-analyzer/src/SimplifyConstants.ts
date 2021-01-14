@@ -8,7 +8,7 @@ import {
   VariableSymbol,
 } from '@glossa-glo/symbol';
 
-export default class SimplifyConstants extends AST.ASTVisitorWithDefault<Types.GLODataType | null> {
+export default class SimplifyConstants extends AST.GlossaASTVisitorWithDefault<Types.GLODataType | null> {
   private localScope: LocalSymbolScope | null = null;
 
   constructor(

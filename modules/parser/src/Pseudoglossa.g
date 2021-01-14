@@ -29,54 +29,19 @@ select_statement
   : "ΕΠΙΛΕΞΕ" expression nl ("ΠΕΡΙΠΤΩΣΗ" select_case ("," select_case)* nl statement_list)* ("ΠΕΡΙΠΤΩΣΗ" "ΑΛΛΙΩΣ" nl statement_list)? "ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ"
   ;
 
-subprogram_declarations
-  : (procedure_declaration | function_declaration)*
-  ;
-
-constant_declaration
-  : "ΣΤΑΘΕΡΕΣ" nl (variable "=" expression nl)+
-  ;
-
-variable_declaration
-  : "ΜΕΤΑΒΛΗΤΕΣ" nl (type ":" variable([expression ("," expression)*]) ("," variable([expression ("," expression)*])?)* nl)+
-  ;
-
-constant_or_variable_declaration
-  : constant_declaration? variable_declaration?
-  ;
-
-procedure_declaration
-  : "ΔΙΑΔΙΚΑΣΙΑ" variable ("(" procedure_or_function_parameter_list ")") nl (constant_or_variable_declaration) "ΑΡΧΗ" statement_list "ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ" nl
-  ;
-
-function_return_type
-  : "ΑΚΕΡΑΙΑ"
-  | "ΛΟΓΙΚΗ"
-  | "ΧΑΡΑΚΤΗΡΕΣ"
-  | "ΠΡΑΓΜΑΤΙΚΗ"
-  ;
-
-function_declaration
-  : "ΣΥΝΑΡΤΗΣΗ" ("(" procedure_or_function_parameter_list ")") ":" function_return_type nl constant_or_variable_declaration "ΑΡΧΗ" statement_list "ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ" nl
-  ;
-
-procedure_or_function_parameter_list
-  : (variable ("," variable)*)
-  ;
-
 type
-  : "ΑΚΕΡΑΙΑ"
-  | "ΠΡΑΓΜΑΤΙΚΗ"
-  | "ΛΟΓΙΚΗ"
-  | "ΧΑΡΑΚΤΗΡΑΣ"
+  : "ΑΚΕΡΑΙΕΣ"
+  | "ΠΡΑΓΜΑΤΙΚΕΣ"
+  | "ΛΟΓΙΚΕΣ"
+  | "ΧΑΡΑΚΤΗΡΕΣ"
   ;
 
 subrange
   : INTEGER ".." INTEGER
   ;
 
-program
-  : "\n"* "ΠΡΟΓΡΑΜΜΑ" variable nl constant_or_variable_declaration "ΑΡΧΗ" nl statement_list "ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ" nl subprogram_declarations
+algorithm
+  : "\n"* "ΑΛΓΟΡΙΘΜΟΣ" variable nl "ΑΡΧΗ" nl statement_list "ΤΕΛΟΣ" variable nl
   ;
 
 statement_list:
@@ -87,9 +52,20 @@ read_statement
   : "ΔΙΑΒΑΣΕ" variable([expression ("," expression)*]) ("," variable([expression ("," expression)*])?)*
   ;
 
-write_statement
-  : "ΓΡΑΨΕ" expression ("," expression)*
+data_statement
+  : "ΔΕΔΟΜΕΝΑ" "//" variable([expression ("," expression)*]) ("," variable([expression ("," expression)*])?)* "//"
   ;
+
+write_statement
+  : ("ΓΡΑΨΕ"|"ΕΜΦΑΝΙΣΕ"|"ΕΚΤΥΠΩΣΕ") expression ("," expression)*
+  ;
+
+results_statement
+  : "ΑΠΟΤΕΛΕΣΜΑΤΑ" "//" variable([expression ("," expression)*]) ("," variable([expression ("," expression)*])?)* "//"
+  ;
+
+swap_statement
+  : "ΑΝΤΙΜΕΤΑΘΕΣΕ" variable([expression ("," expression)*])? "," variable([expression ("," expression)*])?
 
 statement
   : assignment_expression
@@ -98,7 +74,10 @@ statement
   | for_loop
   | while_loop
   | read_statement
+  | data_statement
   | write_statement
+  | results_statement
+  | swap_statement
   | empty
   ;
 
@@ -112,6 +91,10 @@ variable
 
 array_access
   : variable "[" expression ("," expression)* "]"
+  ;
+
+variable_or_array_access
+  : variable([expression ("," expression)*])
   ;
 
 empty
@@ -154,12 +137,4 @@ atom
   | "ΨΕΥΔΗΣ"
   | string_expression
   | "ΟΧΙ" atom
-  ;
-
-call_function
-  : variable "(" (variable ("," variable)* )? ")"
-  ;
-
-call_procedure
-  : "ΚΑΛΕΣΕ" variable "(" (variable ("," variable)* )? ")"
   ;

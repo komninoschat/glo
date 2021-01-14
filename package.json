@@ -12,14 +12,15 @@
     "lerna": "^3.16.4",
     "lint-staged": "^9.2.5",
     "prettier": "^1.18.2",
-    "prettylint": "^1.0.0",
-    "typescript": "^3.6.2"
+    "prettylint": "^1.0.0"
   },
   "scripts": {
     "lint": "eslint ./**/*.ts",
     "bootstrap": "lerna bootstrap"
   },
-  "dependencies": {},
+  "dependencies": {
+    "typescript": "3.9"
+  },
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"

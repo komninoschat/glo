@@ -1,6 +1,6 @@
 import { GLODataType, GLOInteger, GLOReal } from '@glossa-glo/data-types';
 import GLOError from '@glossa-glo/error';
-import LibraryFunction from './LibraryFunction';
+import { LibraryFunction } from '@glossa-glo/library';
 
 export default new LibraryFunction(
   'Α_Τ',

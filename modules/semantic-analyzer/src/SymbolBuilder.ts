@@ -11,7 +11,7 @@ import * as GLOSymbol from '@glossa-glo/symbol';
 import GLOError from '@glossa-glo/error';
 import { ArrayAST, VariableAST } from '@glossa-glo/ast';
 
-export default class SymbolBuilder extends AST.ASTVisitorWithDefault<GLOSymbol.GLOSymbol | void> {
+export default class SymbolBuilder extends AST.GlossaASTVisitorWithDefault<GLOSymbol.GLOSymbol | void> {
   private currentScope: SymbolScope;
   private insideFunction = false;
 

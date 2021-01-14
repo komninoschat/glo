@@ -1,28 +1,24 @@
 import * as Token from './token';
 import CaseInsensitiveMap from '@glossa-glo/case-insensitive-map';
 import * as Types from '@glossa-glo/data-types';
-import GLOError from '@glossa-glo/error';
+import GLOError, { DebugInfoProvider } from '@glossa-glo/error';
+
+export enum Mode {
+  Glossa = 'glossa',
+  Pseudoglossa = 'pseudoglossa',
+}
 
 export class Lexer {
-  public static readonly reservedKeywords = new CaseInsensitiveMap<
+  public static readonly sharedReservedKeywords = new CaseInsensitiveMap<
     string,
     () => Token.Token
   >([
-    ['ΠΡΟΓΡΑΜΜΑ', () => new Token.ProgramToken()],
-    ['ΜΕΤΑΒΛΗΤΕΣ', () => new Token.VariableToken()],
-    ['ΑΡΧΗ', () => new Token.BeginToken()],
-    ['ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ', () => new Token.ProgramEndToken()],
     ['DIV', () => new Token.IntegerDivisionToken()],
-    ['ΑΚΕΡΑΙΕΣ', () => new Token.IntegerToken()],
-    ['ΠΡΑΓΜΑΤΙΚΕΣ', () => new Token.RealToken()],
-    ['ΔΙΑΔΙΚΑΣΙΑ', () => new Token.ProcedureToken()],
     ['ΑΛΗΘΗΣ', () => new Token.TrueToken()],
     ['ΨΕΥΔΗΣ', () => new Token.FalseToken()],
-    ['ΛΟΓΙΚΕΣ', () => new Token.BooleanToken()],
     ['ΑΝ', () => new Token.IfToken()],
     ['ΤΟΤΕ', () => new Token.ThenToken()],
     ['ΑΛΛΙΩΣ', () => new Token.ElseToken()],
-    ['ΧΑΡΑΚΤΗΡΕΣ', () => new Token.StringToken()],
     ['ΚΑΙ', () => new Token.AndToken()],
     ['Η', () => new Token.OrToken()],
     ['ΟΧΙ', () => new Token.NotToken()],
@@ -34,25 +30,53 @@ export class Lexer {
     ['ΟΣΟ', () => new Token.WhileToken()],
     ['ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ', () => new Token.RepeatToken()],
     ['ΜΕΧΡΙΣ_ΟΤΟΥ', () => new Token.UntilToken()],
-    ['ΣΥΝΑΡΤΗΣΗ', () => new Token.FunctionToken()],
     ['ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ', () => new Token.LoopEndToken()],
     ['ΜΕ_ΒΗΜΑ', () => new Token.WithStepToken()],
-    ['ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ', () => new Token.FunctionEndToken()],
-    ['ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ', () => new Token.ProcedureEndToken()],
-    ['ΚΑΛΕΣΕ', () => new Token.CallToken()],
     ['ΔΙΑΒΑΣΕ', () => new Token.ReadToken()],
     ['ΓΡΑΨΕ', () => new Token.WriteToken()],
     ['ΑΛΛΙΩΣ_ΑΝ', () => new Token.ElseIfToken()],
     ['ΤΕΛΟΣ_ΑΝ', () => new Token.EndIfToken()],
-    ['ΑΚΕΡΑΙΑ', () => new Token.IntegerSingularToken()],
-    ['ΠΡΑΓΜΑΤΙΚΗ', () => new Token.RealSingularToken()],
-    ['ΛΟΓΙΚΗ', () => new Token.BooleanSingularToken()],
-    ['ΧΑΡΑΚΤΗΡΑΣ', () => new Token.StringSingularToken()],
     ['ΕΠΙΛΕΞΕ', () => new Token.SelectToken()],
     ['ΠΕΡΙΠΤΩΣΗ', () => new Token.CaseToken()],
     ['ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ', () => new Token.SelectEndToken()],
     ['MOD', () => new Token.ModToken()],
+  ]);
+
+  public static readonly glossaReservedKeywords = new CaseInsensitiveMap<
+    string,
+    () => Token.Token
+  >([
+    ['ΑΡΧΗ', () => new Token.BeginToken()],
+    ['ΠΡΟΓΡΑΜΜΑ', () => new Token.ProgramToken()],
+    ['ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ', () => new Token.ProgramEndToken()],
     ['ΣΤΑΘΕΡΕΣ', () => new Token.ConstantToken()],
+    ['ΜΕΤΑΒΛΗΤΕΣ', () => new Token.VariableToken()],
+    ['ΑΚΕΡΑΙΕΣ', () => new Token.IntegerToken()],
+    ['ΠΡΑΓΜΑΤΙΚΕΣ', () => new Token.RealToken()],
+    ['ΛΟΓΙΚΕΣ', () => new Token.BooleanToken()],
+    ['ΧΑΡΑΚΤΗΡΕΣ', () => new Token.StringToken()],
+    ['ΔΙΑΔΙΚΑΣΙΑ', () => new Token.ProcedureToken()],
+    ['ΣΥΝΑΡΤΗΣΗ', () => new Token.FunctionToken()],
+    ['ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ', () => new Token.FunctionEndToken()],
+    ['ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ', () => new Token.ProcedureEndToken()],
+    ['ΑΚΕΡΑΙΑ', () => new Token.IntegerSingularToken()],
+    ['ΠΡΑΓΜΑΤΙΚΗ', () => new Token.RealSingularToken()],
+    ['ΛΟΓΙΚΗ', () => new Token.BooleanSingularToken()],
+    ['ΧΑΡΑΚΤΗΡΑΣ', () => new Token.StringSingularToken()],
+    ['ΚΑΛΕΣΕ', () => new Token.CallToken()],
+  ]);
+
+  public static readonly pseudoglossaReservedKeywords = new CaseInsensitiveMap<
+    string,
+    () => Token.Token
+  >([
+    ['ΑΛΓΟΡΙΘΜΟΣ', () => new Token.AlgorithmToken()],
+    ['ΤΕΛΟΣ', () => new Token.EndToken()],
+    ['ΕΚΤΥΠΩΣΕ', () => new Token.PrintToken()],
+    ['ΕΜΦΑΝΙΣΕ', () => new Token.ShowToken()],
+    ['ΑΝΤΙΜΕΤΑΘΕΣΕ', () => new Token.SwapToken()],
+    ['ΔΕΔΟΜΕΝΑ', () => new Token.DataToken()],
+    ['ΑΠΟΤΕΛΕΣΜΑΤΑ', () => new Token.ResultsToken()],
   ]);
 
   private readonly numberRegex = /^\d$/;
@@ -93,7 +117,7 @@ export class Lexer {
     return position;
   }
 
-  constructor(sourceCode: string) {
+  constructor(sourceCode: string, public readonly mode: Mode) {
     this.sourceCode = sourceCode;
     this.position = 0;
   }
@@ -155,14 +179,29 @@ export class Lexer {
         number += this.currentCharacter;
         this.advance();
       }
-
-      return new Token.RealConstToken(new Types.GLOReal(parseFloat(number)))
-        .inheritStartPositionFrom(startPosition)
-        .inheritEndPositionFrom(this);
+      if (this.mode === Mode.Pseudoglossa)
+        return new Token.NumberConstToken(
+          new Types.GLONumber(parseFloat(number)),
+        )
+          .inheritStartPositionFrom(startPosition)
+          .inheritEndPositionFrom(this);
+      else
+        return new Token.RealConstToken(new Types.GLOReal(parseFloat(number)))
+          .inheritStartPositionFrom(startPosition)
+          .inheritEndPositionFrom(this);
     } else {
-      return new Token.IntegerConstToken(new Types.GLOInteger(parseInt(number)))
-        .inheritStartPositionFrom(startPosition)
-        .inheritEndPositionFrom(this);
+      if (this.mode === Mode.Pseudoglossa)
+        return new Token.NumberConstToken(
+          new Types.GLONumber(parseFloat(number)),
+        )
+          .inheritStartPositionFrom(startPosition)
+          .inheritEndPositionFrom(this);
+      else
+        return new Token.IntegerConstToken(
+          new Types.GLOInteger(parseInt(number)),
+        )
+          .inheritStartPositionFrom(startPosition)
+          .inheritEndPositionFrom(this);
     }
   }
 
@@ -179,8 +218,22 @@ export class Lexer {
       id += this.currentCharacter;
       this.advance();
     }
-    if (Lexer.reservedKeywords.has(id)) {
-      return (Lexer.reservedKeywords.get(id) as () => Token.Token)()
+    if (Lexer.sharedReservedKeywords.has(id)) {
+      return (Lexer.sharedReservedKeywords.get(id) as () => Token.Token)()
+        .inheritStartPositionFrom(startPosition)
+        .inheritEndPositionFrom(this);
+    } else if (
+      this.mode === Mode.Glossa &&
+      Lexer.glossaReservedKeywords.has(id)
+    ) {
+      return (Lexer.glossaReservedKeywords.get(id) as () => Token.Token)()
+        .inheritStartPositionFrom(startPosition)
+        .inheritEndPositionFrom(this);
+    } else if (
+      this.mode === Mode.Pseudoglossa &&
+      Lexer.pseudoglossaReservedKeywords.has(id)
+    ) {
+      return (Lexer.pseudoglossaReservedKeywords.get(id) as () => Token.Token)()
         .inheritStartPositionFrom(startPosition)
         .inheritEndPositionFrom(this);
     } else {
@@ -193,16 +246,10 @@ export class Lexer {
   private stringConstant(terminator: string) {
     let str = '';
 
-    const startPosition = {
-      start: {
-        linePosition: this.linePosition,
-        characterPosition: this.characterPosition - 1,
-      },
-      end: {
-        linePosition: this.linePosition,
-        characterPosition: this.characterPosition,
-      },
-    };
+    const startPosition = new DebugInfoProvider([
+      [this.linePosition, this.characterPosition - 1],
+      [this.linePosition, this.characterPosition],
+    ]);
 
     while (this.currentCharacter != terminator) {
       if (this.currentCharacter === '\n' || this.currentCharacter === null) {
@@ -216,7 +263,7 @@ export class Lexer {
     this.advance();
 
     return new Token.StringConstantToken(new Types.GLOString(str))
-      .inheritStartPositionFrom(this)
+      .inheritStartPositionFrom(startPosition.start)
       .inheritEndPositionFrom(this);
   }
 
@@ -281,9 +328,14 @@ export class Lexer {
           .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == '/') {
         this.advance();
-        return new Token.RealDivisionToken()
-          .inheritStartPositionFrom(this.getPositionMinus(1))
-          .inheritEndPositionFrom(this);
+        if (this.currentCharacter == '/')
+          return new Token.DoubleSlashToken()
+            .inheritStartPositionFrom(this.getPositionMinus(2))
+            .inheritEndPositionFrom(this);
+        else
+          return new Token.RealDivisionToken()
+            .inheritStartPositionFrom(this.getPositionMinus(1))
+            .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == '(') {
         this.advance();
         return new Token.OpeningParenthesisToken()
@@ -359,9 +411,7 @@ export class Lexer {
       } else if (this.currentCharacter == "'" || this.currentCharacter == '"') {
         const stringTerminator = this.currentCharacter;
         this.advance();
-        return this.stringConstant(stringTerminator)
-          .inheritStartPositionFrom(this.getPositionMinus(1))
-          .inheritEndPositionFrom(this);
+        return this.stringConstant(stringTerminator);
       } else if (this.currentCharacter == '^') {
         this.advance();
         return new Token.ExponentiationToken()
@@ -373,13 +423,10 @@ export class Lexer {
         return this.id();
       } else {
         throw new GLOError(
-          {
-            start: this,
-            end: {
-              linePosition: this.linePosition,
-              characterPosition: this.characterPosition + 1,
-            },
-          },
+          new DebugInfoProvider([
+            [this.linePosition, this.characterPosition],
+            [this.linePosition, this.characterPosition + 1],
+          ]),
           `Μη δεκτός χαρακτήρας '${this.currentCharacter}'`,
         );
       }

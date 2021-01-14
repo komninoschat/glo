@@ -1,6 +1,6 @@
 {
   "name": "@glossa-glo/data-types",
-  "version": "3.0.0-beta",
+  "version": "4.2.0-beta",
   "description": "GLO Data types",
   "author": "komninoschat <komninoschat@gmail.com>",
   "homepage": "https://github.com/komninoschat/glo#readme",
@@ -9,6 +9,7 @@
   },
   "license": "MIT",
   "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
   "directories": {
     "lib": "lib",
     "test": "__tests__"
@@ -29,7 +30,8 @@
     "url": "https://github.com/komninoschat/glo/issues"
   },
   "dependencies": {
-    "@glossa-glo/error": "^1.0.2-beta"
+    "@glossa-glo/error": "^4.2.0-beta",
+    "typescript": "3.9"
   },
   "devDependencies": {
     "@types/chai": "^4.2.0",
@@ -39,7 +41,6 @@
     "cross-env": "^5.2.0",
     "mocha": "^6.2.0",
     "nyc": "^14.1.1",
-    "ts-node": "^8.3.0",
-    "typescript": "^3.7.0-beta"
+    "ts-node": "^8.3.0"
   }
 }

@@ -11,11 +11,11 @@ import { IntegerConstantAST, VariableAST } from '@glossa-glo/ast';
 import GLOError, {
   assertEquality,
   assert,
-  DebugInfoProviderLike,
+  DebugInfoProvider,
 } from '@glossa-glo/error';
 import cloneDeep from 'clone-deep';
 
-export class Interpreter extends AST.AsyncASTVisitorWithDefault<
+export class Interpreter extends AST.GlossaAsyncASTVisitorWithDefault<
   Types.GLODataType
 > {
   public scope: SymbolScope;
@@ -24,7 +24,7 @@ export class Interpreter extends AST.AsyncASTVisitorWithDefault<
     protected readonly ast: AST.AST,
     baseScope: BaseSymbolScope,
     private readonly options: {
-      read: (debugInfoProvider: DebugInfoProviderLike) => Promise<string>;
+      read: (debugInfoProvider: DebugInfoProvider) => Promise<string>;
       write: (...data: string[]) => Promise<void>;
       interceptor?: (node: AST.AST, scope: SymbolScope) => Promise<void>;
     },
@@ -597,16 +597,10 @@ export class Interpreter extends AST.AsyncASTVisitorWithDefault<
   }
 
   public async visitRead(node: AST.ReadAST) {
-    const noInfoError = {
-      start: {
-        linePosition: -1,
-        characterPosition: -1,
-      },
-      end: {
-        linePosition: -1,
-        characterPosition: -1,
-      },
-    };
+    const noInfoError = new DebugInfoProvider([
+      [-1, -1],
+      [-1, -1],
+    ]);
 
     const argNames = node.args.map(arg =>
       arg instanceof VariableAST ? arg.name : arg.array.name,
@@ -658,19 +652,6 @@ export class Interpreter extends AST.AsyncASTVisitorWithDefault<
     for (let i = 0; i < node.args.length; i++) {
       const arg = node.args[i];
       const value = values[i];
-
-      // const valueType = value.constructor as typeof Types.GLODataType;
-
-      // const name = argNames[i];
-      // const variableType = variableTypes[i];
-
-      // Types.assertTypeEquality({
-      //   node: arg,
-      //   left: variableType,
-      //   right: valueType,
-      //   allowPromoteLeft: false,
-      //   message: `Προσπάθησα να διαβάσω την τιμή '${value.print()}' τύπου RIGHT_TYPE στην μεταβλητή '${name}' μη συμβατού τύπου LEFT_TYPE`,
-      // });
 
       if (arg instanceof AST.VariableAST) {
         this.scope.changeValue(arg.name, value);

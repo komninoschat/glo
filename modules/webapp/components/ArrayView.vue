@@ -21,7 +21,7 @@
   color crimson
 
 .table-view
-  background black
+  
   overflow scroll
   // Small hack
   max-height calc(100vh - 2 * 30px - 2 * 100px)
@@ -30,6 +30,7 @@
     display grid
     border 1px solid black
     grid-gap 1px
+    background black
     > *
       padding 4px
       text-align center
@@ -39,6 +40,7 @@
     display inline-grid
     border 1px solid black
     grid-gap 1px
+    background black
     > *
       padding 5px
       text-align center

@@ -1,6 +1,6 @@
 {
   "name": "@glossa-glo/parser",
-  "version": "4.0.1-beta",
+  "version": "4.2.0-beta",
   "description": "GLO parser",
   "author": "komninoschat <komninoschat@gmail.com>",
   "homepage": "https://github.com/komninoschat/glo#readme",
@@ -9,6 +9,7 @@
   },
   "license": "MIT",
   "main": "lib/Parser.js",
+  "typings": "lib/Parser.d.ts",
   "directories": {
     "lib": "lib",
     "test": "__tests__"
@@ -29,10 +30,11 @@
     "url": "https://github.com/komninoschat/glo/issues"
   },
   "dependencies": {
-    "@glossa-glo/ast": "^4.0.1-beta",
-    "@glossa-glo/data-types": "^3.0.0-beta",
-    "@glossa-glo/error": "^1.0.2-beta",
-    "@glossa-glo/lexer": "^4.0.1-beta"
+    "@glossa-glo/ast": "^4.2.0-beta",
+    "@glossa-glo/data-types": "^4.2.0-beta",
+    "@glossa-glo/error": "^4.2.0-beta",
+    "@glossa-glo/lexer": "^4.2.0-beta",
+    "typescript": "3.9"
   },
   "devDependencies": {
     "@types/chai": "^4.2.0",
@@ -42,7 +44,6 @@
     "cross-env": "^5.2.0",
     "mocha": "^6.2.0",
     "nyc": "^14.1.1",
-    "ts-node": "^8.3.0",
-    "typescript": "^3.5.3"
+    "ts-node": "^8.3.0"
   }
 }

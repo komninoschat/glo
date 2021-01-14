@@ -5,7 +5,7 @@ function compareArrays(arr1: any[], arr2: any[]) {
   return arr1.length === arr2.length && arr1.every((v, i) => v === arr2[i]);
 }
 
-export default function assertTypeEquality({
+export function assertTypeEquality({
   node,
   left,
   right,
@@ -94,4 +94,29 @@ export default function assertTypeEquality({
     promoteLeft,
     promoteRight,
   };
+}
+
+export function assertInstanceTypeEquality({
+  node,
+  left,
+  right,
+  allowPromoteLeft = true,
+  allowPromoteRight = true,
+  message, // Replaces LEFT_TYPE and RIGHT_TYPE with types
+}: {
+  node: DebugInfoProvider;
+  left: GLODataType;
+  right: GLODataType;
+  allowPromoteLeft?: boolean;
+  allowPromoteRight?: boolean;
+  message?: string;
+}) {
+  return assertTypeEquality({
+    node,
+    left: left.constructor as typeof GLODataType,
+    right: right.constructor as typeof GLODataType,
+    allowPromoteLeft,
+    allowPromoteRight,
+    message, // Replaces LEFT_TYPE and RIGHT_TYPE with types
+  });
 }

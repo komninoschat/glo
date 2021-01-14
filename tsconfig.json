@@ -8,9 +8,13 @@
     "declaration": true,
     "strict": true,
     "sourceMap": true,
+    "declarationMap": true,
     "esModuleInterop": true,
     "incremental": true,
     "skipLibCheck": true
   },
-  "include": ["modules/**/src/**/*.ts"]
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ]
 }

@@ -1,6 +1,6 @@
 {
   "name": "@glossa-glo/webapp",
-  "version": "4.0.1-beta",
+  "version": "4.2.0-beta",
   "description": "Glo webapp",
   "author": "komninoschat",
   "private": true,
@@ -15,11 +15,13 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.32",
     "@fortawesome/free-solid-svg-icons": "^5.15.1",
     "@fortawesome/vue-fontawesome": "2",
-    "@glossa-glo/ast": "^4.0.1-beta",
-    "@glossa-glo/error": "^1.0.2-beta",
-    "@glossa-glo/glo": "^4.0.1-beta",
-    "@glossa-glo/interpreter": "^4.0.1-beta",
-    "@glossa-glo/symbol": "^4.0.1-beta",
+    "@glossa-glo/ast": "^4.2.0-beta",
+    "@glossa-glo/error": "^4.2.0-beta",
+    "@glossa-glo/glo": "^4.2.0-beta",
+    "@glossa-glo/interpreter": "^4.2.0-beta",
+    "@glossa-glo/ps": "^4.2.0-beta",
+    "@glossa-glo/pseudoglossa-interpreter": "^4.2.0-beta",
+    "@glossa-glo/symbol": "^4.2.0-beta",
     "@linusborg/vue-simple-portal": "^0.1.4",
     "@nuxt/typescript-build": "^0.6.6",
     "@nuxt/typescript-runtime": "^0.4.6",
@@ -34,6 +36,7 @@
     "vue": "^2.6.11",
     "vue-codemirror": "^4.0.6",
     "vue-fullscreen": "^2.1.6",
+    "vue-resize-split-pane": "^0.1.5",
     "vue-save-state": "^1.2.0"
   },
   "devDependencies": {
@@ -44,7 +47,6 @@
     "stylus": "^0.54.7",
     "stylus-loader": "^3.0.2",
     "ts-loader": "^8.0.11",
-    "ts-node-dev": "^1.0.0-pre.44",
-    "typescript": "^4"
+    "ts-node-dev": "^1.0.0-pre.44"
   }
 }
