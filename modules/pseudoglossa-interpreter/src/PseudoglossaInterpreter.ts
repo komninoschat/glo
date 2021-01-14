@@ -71,7 +71,7 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
     )!;
     if (!(leftSymbol instanceof VariableSymbol)) {
       throw new GLOError(
-        node,
+        node.left,
         `Το σύμβολο ${
           left instanceof AST.VariableAST ? left.name : left.array.name
         } έχει χρησιμοποιηθεί ήδη ως ${leftSymbol.print()}.`,
