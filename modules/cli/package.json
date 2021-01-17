@@ -8,8 +8,8 @@
     "access": "public"
   },
   "license": "MIT",
-  "main": "lib/glo.js",
-  "typings": "lib/glo.d.ts",
+  "main": "lib/cli.js",
+  "typings": "lib/cli.d.ts",
   "bin": {
     "glossa": "bin/run"
   },

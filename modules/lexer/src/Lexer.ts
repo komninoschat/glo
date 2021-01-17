@@ -328,11 +328,12 @@ export class Lexer {
           .inheritEndPositionFrom(this);
       } else if (this.currentCharacter == '/') {
         this.advance();
-        if (this.currentCharacter == '/')
+        if (this.currentCharacter == '/') {
+          this.advance();
           return new Token.DoubleSlashToken()
             .inheritStartPositionFrom(this.getPositionMinus(2))
             .inheritEndPositionFrom(this);
-        else
+        } else
           return new Token.RealDivisionToken()
             .inheritStartPositionFrom(this.getPositionMinus(1))
             .inheritEndPositionFrom(this);

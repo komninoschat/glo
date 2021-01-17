@@ -15,23 +15,33 @@ import GLOError, {
   assert,
   DebugInfoProvider,
 } from '@glossa-glo/error';
+import UsedAsArray from './UsedAsArray';
 
 export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWithDefault<
   Types.GLODataType
 > {
   private scope: SymbolScope;
+  private usedAsArray: { name: string; dimensions: number }[] = [];
+  private usedAsArrayVisitor: UsedAsArray;
 
   constructor(
     protected readonly ast: AST.AST,
     public readonly baseScope: BaseSymbolScope,
     private readonly options: {
-      read: (debugInfoProvider: DebugInfoProvider) => Promise<string>;
+      read: (
+        debugInfoProvider: DebugInfoProvider,
+        dimensions: number,
+      ) => Promise<{
+        reading: string;
+        values?: { accessors: number[]; value: string }[];
+      }>;
       write: (...data: string[]) => Promise<void>;
       interceptor?: (node: AST.AST, scope: SymbolScope) => Promise<void>;
     },
   ) {
     super();
     this.scope = baseScope;
+    this.usedAsArrayVisitor = new UsedAsArray(ast);
   }
 
   public async visit(node: AST.AST) {
@@ -857,7 +867,11 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
     if (!value && initializationCheck) {
       throw new GLOError(
         node,
-        `Προσπάθησα να χρησιμοποιήσω το στοιχείο του πίνακα '${node.array.name}' χωρίς πρώτα αυτό να έχει αρχικοποιηθεί`,
+        `Προσπάθησα να χρησιμοποιήσω το στοιχείο [${accessorValues
+          .map(accessor => accessor.print())
+          .join(', ')}] του πίνακα '${
+          node.array.name
+        }' χωρίς πρώτα αυτό να έχει αρχικοποιηθεί`,
       );
     }
 
@@ -865,11 +879,22 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
   }
 
   public async visitWrite(node: AST.WriteAST) {
-    const args = await Promise.all(
-      node.args.map(arg => this.visit(arg)),
-    ).then(args => args.map(arg => arg.print()));
+    const args = await Promise.all(node.args.map(arg => this.visit(arg)));
 
-    await this.options.write(...args);
+    args.forEach((arg, i) => {
+      if (!Types.canBeWritten(arg.constructor as typeof Types.GLODataType)) {
+        throw new GLOError(
+          node.args[i],
+          `Δεν μπορώ να γράψω μεταβλητή με τύπο ${Types.printType(
+            arg.constructor as typeof Types.GLODataType,
+          )}`,
+        );
+      }
+    });
+
+    const prints = args.map(arg => arg.print());
+
+    await this.options.write(...prints);
 
     return new Types.GLOVoid();
   }
@@ -890,7 +915,24 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
         : null,
     );
 
+    variableTypes.forEach((variableType, i) => {
+      if (!variableType) return;
+
+      if (variableType?.isArrayType)
+        variableType = (variableType as any).componentType;
+
+      if (!Types.canBeRead(variableType!)) {
+        throw new GLOError(
+          node.args[i],
+          `Δεν μπορώ να γράψω μεταβλητή με τύπο ${Types.printType(
+            variableType!,
+          )}`,
+        );
+      }
+    });
+
     const values = [];
+    const arrayValues: ({ accessors: number[]; value: string }[] | null)[] = [];
 
     for (let i = 0; i < node.args.length; i++) {
       const argNode = node.args[i];
@@ -898,49 +940,60 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
       const expectedType = variableTypes[i];
       const name = argNames[i];
 
-      const leftSymbol = this.scope.resolve(name);
-      if (leftSymbol && !(leftSymbol instanceof VariableSymbol)) {
+      const symbol = this.scope.resolve(name);
+      if (symbol && !(symbol instanceof VariableSymbol)) {
         throw new GLOError(
           argNode,
-          `Το σύμβολο ${name} έχει χρησιμοποιηθεί ήδη ως ${leftSymbol.print()}.`,
+          `Το σύμβολο ${name} έχει χρησιμοποιηθεί ήδη ως ${symbol.print()}.`,
         );
       }
 
-      const reading = await this.options.read(argNode);
+      const read = await this.options.read(
+        argNode,
+        (symbol instanceof VariableSymbol && symbol.type.isArrayType) ||
+          Boolean(this.usedAsArray.find(a => a.name == name) && !symbol)
+          ? this.usedAsArray.find(a => a.name == name)!.dimensions
+          : 0,
+      );
 
-      if (expectedType === Types.GLONumber) {
-        if (/^[+-]?\d+(\.\d+)*$/.test(reading)) {
-          values.push(new Types.GLONumber(parseFloat(reading)));
-        } else if (/^[+-]?\d+$/.test(reading)) {
-          values.push(new Types.GLONumber(parseInt(reading)));
+      const reading = read.reading;
+      arrayValues[i] = read.values || null;
+
+      if (!(arrayValues[i] && argNode instanceof AST.VariableAST)) {
+        if (expectedType === Types.GLONumber) {
+          if (/^[+-]?\d+(\.\d+)*$/.test(reading)) {
+            values.push(new Types.GLONumber(parseFloat(reading)));
+          } else if (/^[+-]?\d+$/.test(reading)) {
+            values.push(new Types.GLONumber(parseInt(reading)));
+          } else {
+            throw new GLOError(
+              argNode,
+              `Περίμενα να διαβάσω νούμερο στη μεταβλητή ${name} αλλά έλαβα μη έγκυρο νούμερο '${reading}'`,
+            );
+          }
+        } else if (expectedType === Types.GLOString) {
+          values.push(new Types.GLOString(reading));
+        } else if (!expectedType) {
+          if (/^[+-]?\d+(\.\d+)*$/.test(reading)) {
+            values.push(new Types.GLONumber(parseFloat(reading)));
+            variableTypes[i] = Types.GLONumber;
+          } else if (/^[+-]?\d+$/.test(reading)) {
+            values.push(new Types.GLONumber(parseInt(reading)));
+            variableTypes[i] = Types.GLONumber;
+          } else {
+            values.push(new Types.GLOString(reading));
+            variableTypes[i] = Types.GLOString;
+          }
         } else {
           throw new GLOError(
             argNode,
-            `Περίμενα να διαβάσω νούμερο στη μεταβλητή ${name} αλλά έλαβα μη έγκυρο νούμερο '${reading}'`,
+            `Μπορώ να διαβάσω μόνο μεταβλητές τύπου ${Types.printType(
+              Types.GLONumber,
+            )} ή ${Types.printType(
+              Types.GLOString,
+            )}, αλλά έλαβα μεταβλητή τύπου ${Types.printType(expectedType)}`,
           );
         }
-      } else if (expectedType === Types.GLOString) {
-        values.push(new Types.GLOString(reading));
-      } else if (!expectedType) {
-        if (/^[+-]?\d+(\.\d+)*$/.test(reading)) {
-          values.push(new Types.GLONumber(parseFloat(reading)));
-          variableTypes[i] = Types.GLONumber;
-        } else if (/^[+-]?\d+$/.test(reading)) {
-          values.push(new Types.GLONumber(parseInt(reading)));
-          variableTypes[i] = Types.GLONumber;
-        } else {
-          values.push(new Types.GLOString(reading));
-          variableTypes[i] = Types.GLOString;
-        }
-      } else {
-        throw new GLOError(
-          argNode,
-          `Μπορώ να διαβάσω μόνο μεταβλητές τύπου ${Types.printType(
-            Types.GLONumber,
-          )} ή ${Types.printType(
-            Types.GLOString,
-          )}, αλλά έλαβα μεταβλητή τύπου ${Types.printType(expectedType)}`,
-        );
       }
     }
 
@@ -948,7 +1001,102 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
       const arg = node.args[i];
       const value = values[i];
 
-      if (arg instanceof AST.VariableAST) {
+      if (arrayValues[i] && arg instanceof AST.VariableAST) {
+        if (variableTypes[i] && variableTypes[i]!.isArrayType)
+          variableTypes[i] = (variableTypes[i] as any).componentType;
+
+        let toEnter: {
+          accessors: Types.GLODataType[];
+          value: Types.GLODataType;
+        }[] = [];
+
+        arrayValues[i]!.forEach((val, i) => {
+          const accessors = val.accessors.map(n => new Types.GLONumber(n));
+
+          let value: Types.GLODataType;
+          if (/^[+-]?\d+(\.\d+)*$/.test(val.value)) {
+            value = new Types.GLONumber(parseFloat(val.value));
+          } else if (/^[+-]?\d+$/.test(val.value)) {
+            value = new Types.GLONumber(parseInt(val.value));
+          } else {
+            value = new Types.GLOString(val.value);
+          }
+
+          toEnter.push({ accessors, value });
+        });
+
+        const containsNumber = Boolean(
+          toEnter.find(v => v.value instanceof Types.GLONumber),
+        );
+        const containsString = Boolean(
+          toEnter.find(v => v.value instanceof Types.GLOString),
+        );
+
+        let arrayComponentType: typeof Types.GLODataType;
+
+        if (containsNumber && !containsString)
+          arrayComponentType = Types.GLONumber;
+        else if (containsString && !containsNumber)
+          arrayComponentType = Types.GLOString;
+        else {
+          toEnter = toEnter.map(v => ({
+            accessors: v.accessors,
+            value:
+              v.value instanceof Types.GLONumber
+                ? new Types.GLOString(v.value.value.toString())
+                : v.value,
+          }));
+          arrayComponentType = Types.GLOString;
+        }
+
+        if (
+          arrayComponentType === Types.GLONumber &&
+          variableTypes[i] === Types.GLOString
+        ) {
+          toEnter = toEnter.map(v => ({
+            accessors: v.accessors,
+            value:
+              v.value instanceof Types.GLONumber
+                ? new Types.GLOString(v.value.value.toString())
+                : v.value,
+          }));
+          arrayComponentType = Types.GLOString;
+        }
+
+        if (variableTypes[i] && variableTypes[i] !== arrayComponentType) {
+          throw new GLOError(
+            arg,
+            `Δεν μπορώ να διαβάσω μη συμβατή τιμή τύπου ${Types.printType(
+              arrayComponentType,
+            )} στον πίνακα '${arg.name}' τύπου ${Types.printType(
+              variableTypes[i]!,
+            )}`,
+          );
+        }
+
+        if (!this.scope.resolveValue(arg.name)) {
+          const arrayConstructor = Types.createGLOArray(
+            arrayComponentType,
+            Array(arrayValues[i]![0].accessors.length).fill(Infinity),
+          );
+          this.scope.insert(
+            new VariableSymbol(
+              arg.name,
+              arrayConstructor,
+              false,
+              new Array(arrayValues[i]![0].accessors.length).fill(
+                new AST.NumberConstantAST(new Types.GLONumber(Infinity)),
+              ),
+            ),
+          );
+
+          this.scope.changeValue(arg.name, new arrayConstructor());
+        }
+
+        toEnter.forEach(a =>
+          this.scope.changeArrayValue(arg.name, a.accessors, a.value),
+        );
+      } else if (arg instanceof AST.VariableAST) {
         if (!this.scope.resolve(arg.name))
           this.scope.insert(
             new VariableSymbol(arg.name, variableTypes[i]!, false),
@@ -1048,6 +1196,7 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
   }
 
   public async run() {
+    this.usedAsArray = this.usedAsArrayVisitor.run();
     await this.visit(this.ast);
     return;
   }

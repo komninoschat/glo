@@ -7,7 +7,13 @@ import injectLibraryToScope from '@glossa-glo/library-pseudoglossa';
 import { DebugInfoProvider } from '@glossa-glo/error';
 
 export interface Options {
-  read: (debugInfoProvider: DebugInfoProvider) => Promise<string>;
+  read: (
+    debugInfoProvider: DebugInfoProvider,
+    dimensions: number,
+  ) => Promise<{
+    reading: string;
+    values?: { accessors: number[]; value: string }[];
+  }>;
   write: (...data: string[]) => Promise<void>;
   interceptor?: (node: AST, scope: SymbolScope) => Promise<void>;
 }
