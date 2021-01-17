@@ -45,31 +45,35 @@
       ) Κονσόλα εισόδου/εξόδου
       li(
         :style="{'min-height': fontSize}"
-        v-for="{type, message}) in console"
+        v-for="c in console"
       )
-        div.info(
-          v-if="type === 'info'"
-        ) {{ message }}
-        div.read(
-          v-else-if="type === 'read'"
-        ) {{ message }}
-        div.error(
-          v-else-if="type === 'error'"
-        ) {{ message }}
+        div.info-console(
+          v-if="c.type === 'info'"
+        ) {{ c.message }}
+        div.read-console(
+          v-else-if="c.type === 'read'"
+        )
+          .label {{ c.label }}
+          .reading {{ c.message }}
+        div.error-console(
+          v-else-if="c.type === 'error'"
+        ) {{ c.message }}
         div(
           v-else
-        ) {{ message }}
-      input.read-input(
-        rf="readInput"
-        v-model="read"
-        v-show="readFunction"
-        autocomplete="off"
-        autocorrect="off"
-        autocapitalize="off"
-        spellcheck="false"
-        @keyup.enter="submitRead"
-        @blur="submitReadOnMobile"
-      )
+        ) {{ c.message }}
+      .prompt(v-show="showPrompt")
+        span(:style="{fontSize}" v-if="promptLabel") {{ promptLabel }}
+        input.prompt-input(
+          rf="readInput"
+          v-model="promptValue"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+          @keyup.enter="submitPrompt"
+          @blur="submitPromptOnMobile"
+          :style="{fontSize}"
+        )
 </template>
 
 <style lang="stylus" scoped>
@@ -143,26 +147,37 @@ symbol-scope-width = 300px
   @media (max-width 600px)
     padding 10px 12px
     height console-height-mobile
-  >>> .error
+  >>> .error-console
     color #dc3545
     font-weight bold
-  >>> .info
+  >>> .info-console
     color #1034A6
     font-weight bold
-  >>> .read
-    color #8a6606
+  >>> .read-console
+    display flex
+    .label
+      padding-right 7px
+    .reading
+      color #8a6606
   .placeholder
     color rgba(65,65,65,0.5)
     font-weight bold
     pointer-events none
     user-select none
-  .read-input
-    appearance none
-    border 0
-    width 100%
-    font-size 17px
-    outline 0
+  .prompt
     background read-color
+    display flex
+    justify-content center
+    span
+      white-space nowrap
+      padding-right 7px
+    .prompt-input
+      display inline-block
+      appearance none
+      border 0
+      width 100%
+      outline 0
+      background transparent
   &.darkmode
     background black
     color #f8f8ff
@@ -176,7 +191,7 @@ symbol-scope-width = 300px
 
 <script lang="ts">
 import 'reflect-metadata';
-import { Component, Vue } from 'nuxt-property-decorator';
+import { Component, Vue, Watch } from 'nuxt-property-decorator';
 import { Options as InterpreterOptions} from '@glossa-glo/glo';
 import GLOError, { DebugInfoProvider } from '@glossa-glo/error';
 import { ArrayAccessAST, AST, ProgramAST } from '@glossa-glo/ast';
@@ -277,13 +292,14 @@ export default class InterpreterPage extends Vue {
   console: {
     type?: string,
     message: string,
+    [key: string]: any
   }[] = [];
-  read = '';
   interpreting = false;
   stepInterpreting = false;
   lastStep = false;
   animating = false;
-  readFunction: ((reading: string, rejectPromise?: boolean) => void) | null = null;
+  readFunction: ((reading: string, values?: { accessors: number[]; value: string }[], rejectPromise?: boolean) => void) | null = null;
+  dimensions = 0;
 
   get actionBeingPerformed() {
     return this.interpreting || this.stepInterpreting || this.lastStep || this.animating;
@@ -334,7 +350,7 @@ export default class InterpreterPage extends Vue {
     } else if(type === 'info') {
       this.console.push({ type: 'info', message })
     } else if(type === 'read') {
-      this.console.push({ type: 'read', message })
+      this.console.push({ type: 'read', message, label: this.promptLabel })
     } else if(type === 'error') {
       this.console.push({ type: 'error', message: `${line ? `Γραμμή ${line}: ` : ''}Σφάλμα: ${message}` })
     } else if(type === 'program-error') {
@@ -355,19 +371,109 @@ export default class InterpreterPage extends Vue {
     this.console = [];
   }
 
-  submitRead() {
+  promptValue = '';
+  promptLabel  = '';
+  showPrompt = false;
+  promptResolve: ((string) => any)|null = null;
+  prompt(label: string = ''): Promise<string> {
+    return new Promise(resolve => {
+      this.promptValue = '';
+
+      this.showPrompt = true;
+      this.promptLabel = label;
+      this.promptResolve = (a: string) => {
+        this.showPrompt = false;
+        return resolve(a);
+      };
+    })
+  }
+
+  submitPrompt() {
     if (this.readFunction) {
-      this.consoleNewLine(this.read, 'read');
-      this.readFunction(this.read);
-      this.read = '';
-      this.readFunction = null;
+      this.consoleNewLine(this.promptValue, 'read');
+      this.promptResolve!(this.promptValue);
     }
   }
 
-  submitReadOnMobile() {
+  submitPromptOnMobile() {
     if(this.isMobile) {
-      return this.submitRead();
+      return this.submitPrompt();
     }
+  }
+
+  @Watch('readFunction')
+  async readInput() {
+    try {
+      if(this.readFunction) {
+        if(!this.dimensions)
+          this.readFunction(await this.prompt())
+        else {
+          const dimensionLength = await this.prompt('Δώσε μου τις διαστάσεις του πίνακα(χωρισμένες με κόμμα):')
+            .then((r: string) =>
+              r
+                .trim()
+                .replace(/^\[/, '')
+                .replace(/\]$/, '')
+                .split(',')
+                .map(r => r.trim())
+                .map(r => {
+                  if (!/^\d+$/.test(r)) {
+                    this.consoleNewLine(
+                      `Μη έγκυρη τιμή για διάσταση πίνακα '${r}'`,
+                      'error'
+                    );
+                    this.stop();
+                    throw '';
+                  }
+                  return r;
+                })
+                .map(r => parseInt(r))
+                .map(r => {
+                  if(!(r >= 1)) {
+                    this.consoleNewLine(
+                      `Μη έγκυρη τιμή για διάσταση πίνακα '${r}' (κάθε διάσταση πρέπει να είναι μεγαλύτερη ή ίση του 1)`,
+                      'error'
+                    );
+                    this.stop();
+                    throw '';
+                  }
+                  return r;
+                })
+            );
+          if (dimensionLength.length !== this.dimensions) {
+            this.consoleNewLine(
+              `Ο πίνακας χρησιμοποιείται στον αλγόριθμο με ${this.dimensions} ${
+                    this.dimensions === 1 ? 'διάσταση' : 'διαστάσεις'
+                  } ενώ για διάβασμα δώθη${
+                    dimensionLength.length === 1 ? 'κε' : 'καν'
+                  } ${dimensionLength.length} ${
+                    dimensionLength.length === 1 ? 'διάσταση' : 'διαστάσεις'
+                  }`,
+              'error'
+            );
+            return await this.stop();
+          }
+
+          const reads: { accessors: number[]; value: string }[] = [];
+          const recurseRead = async (i = 0, accessors: number[] = []) => {
+            if (dimensionLength.length === i) {
+              reads.push({
+                accessors,
+                value: await this.prompt(
+                  `Δώσε τιμή πίνακα [${accessors.join(', ')}]:`,
+                ),
+              });
+            } else {
+              for (let j = 1; j <= dimensionLength[i]; j++) {
+                await recurseRead(i + 1, [...accessors, j]);
+              }
+            }
+          }
+          await recurseRead();
+          this.readFunction('', reads);
+        }
+      }
+    } catch {}
   }
 
   async interpret(options?: Partial<InterpreterOptions>, ignoreActionBeingPerformed = false) {
@@ -394,20 +500,21 @@ export default class InterpreterPage extends Vue {
         addMissingTrailingNewline(this.sourceCode),
         {
           ...options,
-          read: (debugInfoProvider: DebugInfoProvider) => {
+          read: (debugInfoProvider: DebugInfoProvider, dimensions: number) => {
             if(!store.inputFile) {
               this.highlightRead(debugInfoProvider);
               return new Promise((resolve,reject) => {
-                this.readFunction = (reading: string, rejectPromise = false) => {
+                this.dimensions = dimensions;
+                this.readFunction = (reading: string, values?: { accessors: number[]; value: string }[], rejectPromise = false) => {
                   this.clearReadHighlight();
 
                   if(rejectPromise) {
-                    this.read = '';
                     this.readFunction = null;
+                    this.showPrompt = false;
                     return reject();
                   }
 
-                  return resolve(reading);
+                  return resolve({reading, values});
                 };
               });
             } else {
@@ -525,12 +632,14 @@ export default class InterpreterPage extends Vue {
   }
 
   async stop() {
+    this.showPrompt = false;
+
     if(this.animating) {
-      return this.stopAnimate();
+      this.stopAnimate();
     }
 
     if(this.readFunction) {
-      this.readFunction('', true);
+      this.readFunction('', undefined, true);
     }
 
     if(this.stepInterpretFunction) {

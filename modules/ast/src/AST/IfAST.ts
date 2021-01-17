@@ -5,6 +5,7 @@ export default class IfAST extends AST {
   constructor(
     public readonly condition: AST,
     public readonly statementList: AST[],
+    public readonly isOneLine = false,
   ) {
     super();
     this.addChild(condition, ...statementList);

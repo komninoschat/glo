@@ -24,7 +24,13 @@ export class Interpreter extends AST.GlossaAsyncASTVisitorWithDefault<
     protected readonly ast: AST.AST,
     baseScope: BaseSymbolScope,
     private readonly options: {
-      read: (debugInfoProvider: DebugInfoProvider) => Promise<string>;
+      read: (
+        debugInfoProvider: DebugInfoProvider,
+        dimensions: number,
+      ) => Promise<{
+        reading: string;
+        values?: { accessors: number[]; value: string }[];
+      }>;
       write: (...data: string[]) => Promise<void>;
       interceptor?: (node: AST.AST, scope: SymbolScope) => Promise<void>;
     },
@@ -547,7 +553,11 @@ export class Interpreter extends AST.GlossaAsyncASTVisitorWithDefault<
     if (!value && initializationCheck) {
       throw new GLOError(
         node,
-        `Προσπάθησα να χρησιμοποιήσω το στοιχείο του πίνακα '${node.array.name}' χωρίς πρώτα αυτό να έχει αρχικοποιηθεί`,
+        `Προσπάθησα να χρησιμοποιήσω το στοιχείο [${accessorValues
+          .map(accessor => accessor.print())
+          .join(', ')}] του πίνακα '${
+          node.array.name
+        }' χωρίς πρώτα αυτό να έχει αρχικοποιηθεί`,
       );
     }
 
@@ -620,7 +630,7 @@ export class Interpreter extends AST.GlossaAsyncASTVisitorWithDefault<
       const expectedType = variableTypes[i];
       const name = argNames[i];
 
-      const reading = await this.options.read(argNode);
+      const reading = (await this.options.read(argNode, 0)).reading;
 
       if (expectedType === Types.GLOReal) {
         if (/^[+-]?\d+(\.\d+)*$/.test(reading)) {

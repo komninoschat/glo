@@ -2,7 +2,6 @@ import * as Lexer from '@glossa-glo/lexer';
 import * as AST from '@glossa-glo/ast';
 import * as Types from '@glossa-glo/data-types';
 import GLOError, { DebugInfoProvider } from '@glossa-glo/error';
-import { VariableAST } from '@glossa-glo/ast';
 
 export class Parser {
   private currentToken: Lexer.Token; // Only change through this.eat
@@ -170,7 +169,7 @@ export class Parser {
     ).inheritPositionFrom(forToken);
   }
 
-  private if() {
+  private if(allowSpace = false) {
     const ifToken = Object.assign({}, this.currentToken);
     this.currentToken = this.eat(Lexer.IfToken);
 
@@ -182,6 +181,16 @@ export class Parser {
       true,
     );
 
+    if (!(this.currentToken instanceof Lexer.NewLineToken) && allowSpace) {
+      const statement = this.statement();
+
+      this.nl('Περίμενα νέα γραμμή μετά από εντολή συνθήκης ΑΝ');
+
+      return new AST.IfAST(condition, [statement], true).inheritPositionFrom(
+        ifToken,
+      );
+    }
+
     this.nl('Περίμενα νέα γραμμή μετά από ΤΟΤΕ');
 
     const statementList = this.statementList();
@@ -190,7 +199,12 @@ export class Parser {
   }
 
   private ifStatement() {
-    const firstIf = this.if();
+    const firstIf = this.if(this.lexer.mode === Lexer.Mode.Pseudoglossa);
+
+    if (firstIf.isOneLine) {
+      return firstIf;
+    }
+
     let currentIf = firstIf;
 
     while (this.currentToken instanceof Lexer.ElseIfToken) {
@@ -961,6 +975,13 @@ export class Parser {
       args.push(variableOrArrayAccess());
     }
 
+    if (!(this.currentToken instanceof Lexer.NewLineToken)) {
+      throw new GLOError(
+        this.previousToken!,
+        'Περίμενα κόμμα ανάμεσα στις παραμέτρους στην εντολή ΔΙΑΒΑΣΕ',
+      );
+    }
+
     return new AST.ReadAST(args).inheritPositionFrom(readToken);
   }
 
@@ -972,11 +993,17 @@ export class Parser {
   ) {
     const writeToken = Object.assign({}, this.currentToken);
     this.currentToken = this.eat(token);
+    const commandName =
+      token instanceof Lexer.WriteToken
+        ? 'ΓΡΑΨΕ'
+        : token instanceof Lexer.ShowToken
+        ? 'ΕΜΦΑΝΙΣΕ'
+        : 'ΕΚΤΥΠΩΣΕ';
 
     if (this.currentToken instanceof Lexer.NewLineToken) {
       throw new GLOError(
         this.previousToken!,
-        'Περίμενα παραμέτρους για την εντολή ΓΡΑΨΕ',
+        `Περίμενα παραμέτρους για την εντολή ${commandName}`,
       );
     }
 
@@ -988,11 +1015,18 @@ export class Parser {
       if (this.currentToken instanceof Lexer.NewLineToken) {
         throw new GLOError(
           this.previousToken!,
-          'Περίμενα έκφραση μετά το κόμμα στην εντολή ΓΡΑΨΕ',
+          `Περίμενα έκφραση μετά το κόμμα στην εντολή ${commandName}`,
         );
       }
 
       args.push(this.expression());
+    }
+
+    if (!(this.currentToken instanceof Lexer.NewLineToken)) {
+      throw new GLOError(
+        this.previousTokenEndLocationProvider,
+        `Περίμενα κόμμα ανάμεσα στις παραμέτρους στην εντολή ${commandName}`,
+      );
     }
 
     return new AST.WriteAST(args).inheritPositionFrom(writeToken);
@@ -1065,6 +1099,13 @@ export class Parser {
       args.push(variableOrArrayAccess());
     }
 
+    if (this.currentToken instanceof Lexer.IdToken) {
+      throw new GLOError(
+        this.previousTokenEndLocationProvider,
+        `Περίμενα κόμμα ανάμεσα στις παραμέτρους της εντολής ΔΕΔΟΜΕΝΑ`,
+      );
+    }
+
     this.currentToken = this.eat(
       Lexer.DoubleSlashToken,
       'Περίμενα // μετά από παραμέτρους εντολής ΔΕΔΟΜΕΝΑ',
@@ -1097,6 +1138,13 @@ export class Parser {
       }
 
       args.push(this.expression());
+    }
+
+    if (this.currentToken instanceof Lexer.IdToken) {
+      throw new GLOError(
+        this.previousTokenEndLocationProvider,
+        `Περίμενα κόμμα ανάμεσα στις παραμέτρους της εντολής ΑΠΟΤΕΛΕΣΜΑΤΑ`,
+      );
     }
 
     this.currentToken = this.eat(
@@ -1312,7 +1360,7 @@ export class Parser {
     return node;
   }
 
-  private arrayAccess(variableAst?: VariableAST) {
+  private arrayAccess(variableAst?: AST.VariableAST) {
     const array = variableAst || this.variable();
 
     this.currentToken = this.eat(Lexer.OpeningBracketToken);
