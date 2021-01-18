@@ -69,9 +69,9 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
       node.left instanceof AST.VariableAST
         ? this.visitVariable(node.left, true)
         : this.visit(node.left);
-    const right = this.visit(node.right);
+    let right = this.visit(node.right);
 
-    assertTypeEquality({
+    const { promoteRight } = assertTypeEquality({
       node,
       left,
       right,
@@ -82,6 +82,12 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
           : node.left.array.name
       } τύπου LEFT_TYPE`,
     });
+
+    if (promoteRight && right !== promoteRight) {
+      right = promoteRight;
+      node.right = node.right.promote!(promoteRight, this.currentScope as any);
+    }
+
     return left;
   }
 

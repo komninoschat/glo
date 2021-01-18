@@ -544,7 +544,7 @@ export class Parser {
         ids.push(variableOrArrayDeclaration(type));
       }
 
-      ids.forEach(d => declarations.push(d));
+      ids.forEach((d) => declarations.push(d));
 
       if (this.currentToken instanceof Lexer.IdToken) {
         throw new GLOError(

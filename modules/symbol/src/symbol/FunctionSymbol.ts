@@ -7,7 +7,8 @@ export interface FunctionOverload {
   returnType: typeof Types.GLODataType;
 }
 
-export default class FunctionSymbol extends GLOSymbol
+export default class FunctionSymbol
+  extends GLOSymbol
   implements FunctionOverload {
   public readonly args: VariableSymbol[];
 
@@ -19,12 +20,13 @@ export default class FunctionSymbol extends GLOSymbol
   ) {
     super(name);
     this.args = args;
-    [args.length, ...overloads.map(overload => overload.args.length)].reduce(
+    [args.length, ...overloads.map((overload) => overload.args.length)].reduce(
       (a, b, i) => {
         if (a != b) {
           throw new Error(
-            `Overloads ${i -
-              1} and ${i} of function ${name} do not have the same number of arguments`,
+            `Overloads ${
+              i - 1
+            } and ${i} of function ${name} do not have the same number of arguments`,
           );
         }
         return a;

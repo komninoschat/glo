@@ -15,9 +15,7 @@ import GLOError, {
 } from '@glossa-glo/error';
 import cloneDeep from 'clone-deep';
 
-export class Interpreter extends AST.GlossaAsyncASTVisitorWithDefault<
-  Types.GLODataType
-> {
+export class Interpreter extends AST.GlossaAsyncASTVisitorWithDefault<Types.GLODataType> {
   public scope: SymbolScope;
 
   constructor(
@@ -82,7 +80,7 @@ export class Interpreter extends AST.GlossaAsyncASTVisitorWithDefault<
       )!.dimensionLength!;
 
       const accessorValues = await Promise.all(
-        left.accessors.map(node => this.visit(node)),
+        left.accessors.map((node) => this.visit(node)),
       );
 
       for (let i = 0; i < accessorValues.length; i++) {
@@ -275,7 +273,7 @@ export class Interpreter extends AST.GlossaAsyncASTVisitorWithDefault<
 
   public async visitProcedureDeclaration(node: AST.ProcedureDeclarationAST) {
     const procedure = new Types.GLOProcedure(async (args, rewrite) => {
-      await this.withNewScope(node.name.name, async scope => {
+      await this.withNewScope(node.name.name, async (scope) => {
         const symbol = this.scope.resolve(node.name.name)!; // Guaranteed by TypeChecker
         if (!this.scope.has(symbol)) {
           // Allow recursion
@@ -293,7 +291,7 @@ export class Interpreter extends AST.GlossaAsyncASTVisitorWithDefault<
           // Filter uninitialized variables
           .filter((arg, i) => !(args[i] instanceof Types.GLOVoid))
           // Filter unitialized array indices
-          .map(arg => arg.name)
+          .map((arg) => arg.name)
           .forEach((argName, i) => {
             scope.changeValue(argName, cloneDeep(args[i]));
           });
@@ -374,12 +372,12 @@ export class Interpreter extends AST.GlossaAsyncASTVisitorWithDefault<
   }
 
   public async visitFunctionCall(node: AST.FunctionCallAST) {
-    const args = await Promise.all(node.args.map(arg => this.visit(arg)));
+    const args = await Promise.all(node.args.map((arg) => this.visit(arg)));
     const func = this.scope.resolveValue<Types.GLOFunction>(node.name)!;
 
     await func.call(args, node.args);
 
-    const returnValue = this.scope.resolveValue<Types.GLOFunction>(node.name)!
+    let returnValue = this.scope.resolveValue<Types.GLOFunction>(node.name)!
       .returnValue;
 
     if (!returnValue) {
@@ -389,12 +387,22 @@ export class Interpreter extends AST.GlossaAsyncASTVisitorWithDefault<
       );
     }
 
+    if (node.runtimePromote) {
+      if (returnValue.promote && returnValue.promote.has(node.runtimePromote)) {
+        returnValue = returnValue.promote.get(node.runtimePromote)!();
+      } else {
+        throw new Error(
+          `Program error: Cannot promote ${returnValue.constructor.name} to ${node.runtimePromote.name}`,
+        );
+      }
+    }
+
     return returnValue;
   }
 
   public async visitProcedureCall(node: AST.ProcedureCallAST) {
     const args = await Promise.all(
-      node.args.map(arg => {
+      node.args.map((arg) => {
         if (arg instanceof AST.VariableAST) {
           return this.visitVariable(arg, false);
         } else if (arg instanceof AST.ArrayAccessAST) {
@@ -409,7 +417,7 @@ export class Interpreter extends AST.GlossaAsyncASTVisitorWithDefault<
     await procedure.call(
       args,
       await Promise.all(
-        node.args.map(async arg => {
+        node.args.map(async (arg) => {
           if (arg instanceof AST.VariableAST) {
             return !(this.scope.resolve(arg.name) as VariableSymbol).isConstant
               ? {
@@ -421,7 +429,7 @@ export class Interpreter extends AST.GlossaAsyncASTVisitorWithDefault<
             return {
               name: arg.array.name,
               accessors: await Promise.all(
-                arg.accessors.map(arg => this.visit(arg)),
+                arg.accessors.map((arg) => this.visit(arg)),
               ),
             };
           } else return false;
@@ -527,7 +535,7 @@ export class Interpreter extends AST.GlossaAsyncASTVisitorWithDefault<
     );
 
     const accessorValues = await Promise.all(
-      node.accessors.map(node => this.visit(node)),
+      node.accessors.map((node) => this.visit(node)),
     );
 
     for (let i = 0; i < accessorValues.length; i++) {
@@ -554,7 +562,7 @@ export class Interpreter extends AST.GlossaAsyncASTVisitorWithDefault<
       throw new GLOError(
         node,
         `Προσπάθησα να χρησιμοποιήσω το στοιχείο [${accessorValues
-          .map(accessor => accessor.print())
+          .map((accessor) => accessor.print())
           .join(', ')}] του πίνακα '${
           node.array.name
         }' χωρίς πρώτα αυτό να έχει αρχικοποιηθεί`,
@@ -565,8 +573,8 @@ export class Interpreter extends AST.GlossaAsyncASTVisitorWithDefault<
   }
 
   public async visitFunctionDeclaration(node: AST.FunctionDeclarationAST) {
-    const func = new Types.GLOFunction(async args => {
-      await this.withNewScope(node.name.name, async scope => {
+    const func = new Types.GLOFunction(async (args) => {
+      await this.withNewScope(node.name.name, async (scope) => {
         const symbol = this.scope.resolve(node.name.name)!; // Guaranteed by TypeChecker
         if (!this.scope.has(symbol)) {
           // Allow recursion
@@ -580,7 +588,7 @@ export class Interpreter extends AST.GlossaAsyncASTVisitorWithDefault<
         }
 
         node.args
-          .map(arg => arg.name)
+          .map((arg) => arg.name)
           .forEach((argName, i) => {
             scope.changeValue(argName, args[i]);
           });
@@ -598,8 +606,8 @@ export class Interpreter extends AST.GlossaAsyncASTVisitorWithDefault<
 
   public async visitWrite(node: AST.WriteAST) {
     const args = await Promise.all(
-      node.args.map(arg => this.visit(arg)),
-    ).then(args => args.map(arg => arg.print()));
+      node.args.map((arg) => this.visit(arg)),
+    ).then((args) => args.map((arg) => arg.print()));
 
     await this.options.write(...args);
 
@@ -612,7 +620,7 @@ export class Interpreter extends AST.GlossaAsyncASTVisitorWithDefault<
       [-1, -1],
     ]);
 
-    const argNames = node.args.map(arg =>
+    const argNames = node.args.map((arg) =>
       arg instanceof VariableAST ? arg.name : arg.array.name,
     );
     const variableTypes = node.args.map((arg, i) =>
@@ -668,7 +676,7 @@ export class Interpreter extends AST.GlossaAsyncASTVisitorWithDefault<
       } else {
         this.scope.changeArrayValue(
           arg.array.name,
-          await Promise.all(arg.accessors.map(arg => this.visit(arg))),
+          await Promise.all(arg.accessors.map((arg) => this.visit(arg))),
           value,
         );
       }

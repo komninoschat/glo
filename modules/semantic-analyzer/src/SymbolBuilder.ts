@@ -112,18 +112,18 @@ export default class SymbolBuilder extends AST.GlossaASTVisitorWithDefault<GLOSy
     );
 
     const procedureVariables = [
-      ...node.variableDeclarations.map(arg =>
+      ...node.variableDeclarations.map((arg) =>
         this.visitVariableDeclaration(arg),
       ),
-      ...node.constantDeclarations.map(arg =>
+      ...node.constantDeclarations.map((arg) =>
         this.visitConstantDeclaration(arg),
       ),
     ];
 
     const procedureVariableNames = procedureVariables
-      .filter(v => !v.isConstant)
-      .map(v => v.name);
-    node.args.forEach(arg => {
+      .filter((v) => !v.isConstant)
+      .map((v) => v.name);
+    node.args.forEach((arg) => {
       if (!procedureVariableNames.includes(arg.name)) {
         throw new GLOError(
           arg,
@@ -132,11 +132,11 @@ export default class SymbolBuilder extends AST.GlossaASTVisitorWithDefault<GLOSy
       }
     });
 
-    const argNames = node.args.map(arg => arg.name);
+    const argNames = node.args.map((arg) => arg.name);
 
     const argSymbols = argNames.map(
-      argName =>
-        procedureVariables.find(variable => variable.name === argName)!,
+      (argName) =>
+        procedureVariables.find((variable) => variable.name === argName)!,
     );
 
     this.currentScope
@@ -160,18 +160,18 @@ export default class SymbolBuilder extends AST.GlossaASTVisitorWithDefault<GLOSy
     );
 
     const functionVariables = [
-      ...node.variableDeclarations.map(arg =>
+      ...node.variableDeclarations.map((arg) =>
         this.visitVariableDeclaration(arg),
       ),
-      ...node.constantDeclarations.map(arg =>
+      ...node.constantDeclarations.map((arg) =>
         this.visitConstantDeclaration(arg),
       ),
     ];
 
     const functionVariableNames = functionVariables
-      .filter(v => !v.isConstant)
-      .map(v => v.name);
-    node.args.forEach(arg => {
+      .filter((v) => !v.isConstant)
+      .map((v) => v.name);
+    node.args.forEach((arg) => {
       if (!functionVariableNames.includes(arg.name)) {
         throw new GLOError(
           arg,
@@ -180,10 +180,11 @@ export default class SymbolBuilder extends AST.GlossaASTVisitorWithDefault<GLOSy
       }
     });
 
-    const argNames = node.args.map(arg => arg.name);
+    const argNames = node.args.map((arg) => arg.name);
 
     const argSymbols = argNames.map(
-      argName => functionVariables.find(variable => variable.name === argName)!,
+      (argName) =>
+        functionVariables.find((variable) => variable.name === argName)!,
     );
 
     this.currentScope
@@ -288,7 +289,7 @@ export default class SymbolBuilder extends AST.GlossaASTVisitorWithDefault<GLOSy
   }
 
   public visitRead(node: AST.ReadAST) {
-    node.children.forEach(child => {
+    node.children.forEach((child) => {
       const symbol = this.visit(child);
 
       if (symbol instanceof VariableSymbol && symbol.isConstant) {

@@ -116,8 +116,8 @@ class Psi extends Command {
                   .replace(/^\[/, '')
                   .replace(/\]$/, '')
                   .split(',')
-                  .map(r => r.trim())
-                  .map(r => {
+                  .map((r) => r.trim())
+                  .map((r) => {
                     if (!/^\d+$/.test(r)) {
                       console.error(
                         `Μη έγκυρη τιμή για διάσταση πίνακα '${r}'`,
@@ -126,8 +126,8 @@ class Psi extends Command {
                     }
                     return r;
                   })
-                  .map(r => parseInt(r))
-                  .map(r => {
+                  .map((r) => parseInt(r))
+                  .map((r) => {
                     if (!(r >= 1)) {
                       console.error(
                         `Μη έγκυρη τιμή για διάσταση πίνακα '${r}' (κάθε διάσταση πρέπει να είναι μεγαλύτερη ή ίση του 1)`,
@@ -169,8 +169,8 @@ class Psi extends Command {
             return { values: reads, reading: '' };
           } else
             return {
-              reading: await new Promise(resolve => {
-                rl.question('', data => {
+              reading: await new Promise((resolve) => {
+                rl.question('', (data) => {
                   resolve(data);
                 });
               }),
