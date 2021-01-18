@@ -1,8 +1,9 @@
 import { DebugInfoProvider } from '@glossa-glo/error';
 import { GLODataType } from '@glossa-glo/data-types';
+import type { SymbolScope } from '@glossa-glo/symbol';
 
 interface AST {
-  promote?(target: typeof GLODataType): AST;
+  promote?(target: typeof GLODataType, scope: SymbolScope): AST;
 }
 
 abstract class AST extends DebugInfoProvider {
@@ -18,7 +19,7 @@ abstract class AST extends DebugInfoProvider {
   }
 
   public addChild(...children: AST[]) {
-    children.forEach(child => {
+    children.forEach((child) => {
       child.parent = this;
       this._children.push(child);
     });

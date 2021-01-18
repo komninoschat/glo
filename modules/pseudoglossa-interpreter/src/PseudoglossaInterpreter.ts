@@ -17,9 +17,7 @@ import GLOError, {
 } from '@glossa-glo/error';
 import UsedAsArray from './UsedAsArray';
 
-export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWithDefault<
-  Types.GLODataType
-> {
+export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWithDefault<Types.GLODataType> {
   private scope: SymbolScope;
   private usedAsArray: { name: string; dimensions: number }[] = [];
   private usedAsArrayVisitor: UsedAsArray;
@@ -112,6 +110,11 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
         allowPromoteLeft: false,
         left: this.scope.resolve(left.name, VariableSymbol)!.type,
         right: newValue.constructor as typeof Types.GLODataType,
+        message: `Δεν μπορώ να αναθέσω τιμή τύπου RIGHT_TYPE στη μεταβλητή ${
+          node.left instanceof AST.VariableAST
+            ? node.left.name
+            : node.left.array.name
+        } τύπου LEFT_TYPE`,
       });
 
       this.scope.changeValue(left.name, newValue);
@@ -168,7 +171,7 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
       });
 
       const accessorValues = await Promise.all(
-        left.accessors.map(node => this.visit(node)),
+        left.accessors.map((node) => this.visit(node)),
       );
 
       for (let i = 0; i < accessorValues.length; i++) {
@@ -826,7 +829,7 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
     );
 
     const accessorValues = await Promise.all(
-      node.accessors.map(node => this.visit(node)),
+      node.accessors.map((node) => this.visit(node)),
     );
 
     for (let i = 0; i < accessorValues.length; i++) {
@@ -868,7 +871,7 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
       throw new GLOError(
         node,
         `Προσπάθησα να χρησιμοποιήσω το στοιχείο [${accessorValues
-          .map(accessor => accessor.print())
+          .map((accessor) => accessor.print())
           .join(', ')}] του πίνακα '${
           node.array.name
         }' χωρίς πρώτα αυτό να έχει αρχικοποιηθεί`,
@@ -879,7 +882,7 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
   }
 
   public async visitWrite(node: AST.WriteAST) {
-    const args = await Promise.all(node.args.map(arg => this.visit(arg)));
+    const args = await Promise.all(node.args.map((arg) => this.visit(arg)));
 
     args.forEach((arg, i) => {
       if (!Types.canBeWritten(arg.constructor as typeof Types.GLODataType)) {
@@ -892,7 +895,7 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
       }
     });
 
-    const prints = args.map(arg => arg.print());
+    const prints = args.map((arg) => arg.print());
 
     await this.options.write(...prints);
 
@@ -900,7 +903,7 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
   }
 
   public async visitRead(node: AST.ReadAST) {
-    const argNames = node.args.map(arg =>
+    const argNames = node.args.map((arg) =>
       arg instanceof AST.VariableAST ? arg.name : arg.array.name,
     );
     const variableTypes: (
@@ -951,8 +954,8 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
       const read = await this.options.read(
         argNode,
         (symbol instanceof VariableSymbol && symbol.type.isArrayType) ||
-          Boolean(this.usedAsArray.find(a => a.name == name) && !symbol)
-          ? this.usedAsArray.find(a => a.name == name)!.dimensions
+          Boolean(this.usedAsArray.find((a) => a.name == name) && !symbol)
+          ? this.usedAsArray.find((a) => a.name == name)!.dimensions
           : 0,
       );
 
@@ -1011,7 +1014,7 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
         }[] = [];
 
         arrayValues[i]!.forEach((val, i) => {
-          const accessors = val.accessors.map(n => new Types.GLONumber(n));
+          const accessors = val.accessors.map((n) => new Types.GLONumber(n));
 
           let value: Types.GLODataType;
           if (/^[+-]?\d+(\.\d+)*$/.test(val.value)) {
@@ -1026,10 +1029,10 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
         });
 
         const containsNumber = Boolean(
-          toEnter.find(v => v.value instanceof Types.GLONumber),
+          toEnter.find((v) => v.value instanceof Types.GLONumber),
         );
         const containsString = Boolean(
-          toEnter.find(v => v.value instanceof Types.GLOString),
+          toEnter.find((v) => v.value instanceof Types.GLOString),
         );
 
         let arrayComponentType: typeof Types.GLODataType;
@@ -1039,7 +1042,7 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
         else if (containsString && !containsNumber)
           arrayComponentType = Types.GLOString;
         else {
-          toEnter = toEnter.map(v => ({
+          toEnter = toEnter.map((v) => ({
             accessors: v.accessors,
             value:
               v.value instanceof Types.GLONumber
@@ -1053,7 +1056,7 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
           arrayComponentType === Types.GLONumber &&
           variableTypes[i] === Types.GLOString
         ) {
-          toEnter = toEnter.map(v => ({
+          toEnter = toEnter.map((v) => ({
             accessors: v.accessors,
             value:
               v.value instanceof Types.GLONumber
@@ -1093,7 +1096,7 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
           this.scope.changeValue(arg.name, new arrayConstructor());
         }
 
-        toEnter.forEach(a =>
+        toEnter.forEach((a) =>
           this.scope.changeArrayValue(arg.name, a.accessors, a.value),
         );
       } else if (arg instanceof AST.VariableAST) {
@@ -1123,7 +1126,7 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
         }
         this.scope.changeArrayValue(
           arg.array.name,
-          await Promise.all(arg.accessors.map(arg => this.visit(arg))),
+          await Promise.all(arg.accessors.map((arg) => this.visit(arg))),
           value,
         );
       }
@@ -1133,7 +1136,7 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
   }
 
   public async visitFunctionCall(node: AST.FunctionCallAST) {
-    const args = await Promise.all(node.args.map(arg => this.visit(arg)));
+    const args = await Promise.all(node.args.map((arg) => this.visit(arg)));
     const func = this.scope.resolveValue<Types.GLOFunction>(node.name);
 
     if (!func) {
@@ -1180,7 +1183,7 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
         : this.scope.changeArrayValue(
             node.array.name,
             await Promise.all(
-              node.accessors.map(accessor => this.visit(accessor)),
+              node.accessors.map((accessor) => this.visit(accessor)),
             ),
             value,
           );

@@ -71,7 +71,17 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
         : this.visit(node.left);
     const right = this.visit(node.right);
 
-    assertTypeEquality({ node, left, right, allowPromoteLeft: false });
+    assertTypeEquality({
+      node,
+      left,
+      right,
+      allowPromoteLeft: false,
+      message: `Δεν μπορώ να αναθέσω τιμή τύπου RIGHT_TYPE στη μεταβλητή ${
+        node.left instanceof AST.VariableAST
+          ? node.left.name
+          : node.left.array.name
+      } τύπου LEFT_TYPE`,
+    });
     return left;
   }
 
@@ -87,34 +97,12 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
 
     if (promoteLeft && left !== promoteLeft) {
       left = promoteLeft;
-      if (node.left instanceof AST.VariableAST) {
-        const symbol = this.currentScope.resolve(
-          node.left.name,
-          VariableSymbol,
-        )!;
-
-        symbol.type = promoteLeft;
-
-        this.currentScope.change(node.left.name, symbol);
-      } else {
-        node.left = node.left.promote!(promoteLeft);
-      }
+      node.left = node.left.promote!(promoteLeft, this.currentScope as any);
     }
 
     if (promoteRight && right !== promoteRight) {
       right = promoteRight;
-      if (node.right instanceof AST.VariableAST) {
-        const symbol = this.currentScope.resolve(
-          node.right.name,
-          VariableSymbol,
-        )!;
-
-        symbol.type = promoteRight;
-
-        this.currentScope.change(node.right.name, symbol);
-      } else {
-        node.right.promote!(promoteRight);
-      }
+      node.right = node.right.promote!(promoteRight, this.currentScope as any);
     }
 
     assert(
@@ -140,34 +128,12 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
 
     if (promoteLeft && left !== promoteLeft) {
       left = promoteLeft;
-      if (node.left instanceof AST.VariableAST) {
-        const symbol = this.currentScope.resolve(
-          node.left.name,
-          VariableSymbol,
-        )!;
-
-        symbol.type = promoteLeft;
-
-        this.currentScope.change(node.left.name, symbol);
-      } else {
-        node.left = node.left.promote!(promoteLeft);
-      }
+      node.left = node.left.promote!(promoteLeft, this.currentScope as any);
     }
 
     if (promoteRight && right !== promoteRight) {
       right = promoteRight;
-      if (node.right instanceof AST.VariableAST) {
-        const symbol = this.currentScope.resolve(
-          node.right.name,
-          VariableSymbol,
-        )!;
-
-        symbol.type = promoteRight;
-
-        this.currentScope.change(node.right.name, symbol);
-      } else {
-        node.right.promote!(promoteRight);
-      }
+      node.right = node.right.promote!(promoteRight, this.currentScope as any);
     }
 
     assert(
@@ -193,34 +159,12 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
 
     if (promoteLeft && left !== promoteLeft) {
       left = promoteLeft;
-      if (node.left instanceof AST.VariableAST) {
-        const symbol = this.currentScope.resolve(
-          node.left.name,
-          VariableSymbol,
-        )!;
-
-        symbol.type = promoteLeft;
-
-        this.currentScope.change(node.left.name, symbol);
-      } else {
-        node.left = node.left.promote!(promoteLeft);
-      }
+      node.left = node.left.promote!(promoteLeft, this.currentScope as any);
     }
 
     if (promoteRight && right !== promoteRight) {
       right = promoteRight;
-      if (node.right instanceof AST.VariableAST) {
-        const symbol = this.currentScope.resolve(
-          node.right.name,
-          VariableSymbol,
-        )!;
-
-        symbol.type = promoteRight;
-
-        this.currentScope.change(node.right.name, symbol);
-      } else {
-        node.right.promote!(promoteRight);
-      }
+      node.right = node.right.promote!(promoteRight, this.currentScope as any);
     }
 
     assert(
@@ -246,34 +190,12 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
 
     if (promoteLeft && left !== promoteLeft) {
       left = promoteLeft;
-      if (node.left instanceof AST.VariableAST) {
-        const symbol = this.currentScope.resolve(
-          node.left.name,
-          VariableSymbol,
-        )!;
-
-        symbol.type = promoteLeft;
-
-        this.currentScope.change(node.left.name, symbol);
-      } else {
-        node.left = node.left.promote!(promoteLeft);
-      }
+      node.left = node.left.promote!(promoteLeft, this.currentScope as any);
     }
 
     if (promoteRight && right !== promoteRight) {
       right = promoteRight;
-      if (node.right instanceof AST.VariableAST) {
-        const symbol = this.currentScope.resolve(
-          node.right.name,
-          VariableSymbol,
-        )!;
-
-        symbol.type = promoteRight;
-
-        this.currentScope.change(node.right.name, symbol);
-      } else {
-        node.right.promote!(promoteRight);
-      }
+      node.right = node.right.promote!(promoteRight, this.currentScope as any);
     }
 
     assert(
@@ -299,34 +221,12 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
 
     if (promoteLeft && left !== promoteLeft) {
       left = promoteLeft;
-      if (node.left instanceof AST.VariableAST) {
-        const symbol = this.currentScope.resolve(
-          node.left.name,
-          VariableSymbol,
-        )!;
-
-        symbol.type = promoteLeft;
-
-        this.currentScope.change(node.left.name, symbol);
-      } else {
-        node.left = node.left.promote!(promoteLeft);
-      }
+      node.left = node.left.promote!(promoteLeft, this.currentScope as any);
     }
 
     if (promoteRight && right !== promoteRight) {
       right = promoteRight;
-      if (node.right instanceof AST.VariableAST) {
-        const symbol = this.currentScope.resolve(
-          node.right.name,
-          VariableSymbol,
-        )!;
-
-        symbol.type = promoteRight;
-
-        this.currentScope.change(node.right.name, symbol);
-      } else {
-        node.right.promote!(promoteRight);
-      }
+      node.right = node.right.promote!(promoteRight, this.currentScope as any);
     }
 
     assert(
@@ -352,34 +252,12 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
 
     if (promoteLeft && left !== promoteLeft) {
       left = promoteLeft;
-      if (node.left instanceof AST.VariableAST) {
-        const symbol = this.currentScope.resolve(
-          node.left.name,
-          VariableSymbol,
-        )!;
-
-        symbol.type = promoteLeft;
-
-        this.currentScope.change(node.left.name, symbol);
-      } else {
-        node.left = node.left.promote!(promoteLeft);
-      }
+      node.left = node.left.promote!(promoteLeft, this.currentScope as any);
     }
 
     if (promoteRight && right !== promoteRight) {
       right = promoteRight;
-      if (node.right instanceof AST.VariableAST) {
-        const symbol = this.currentScope.resolve(
-          node.right.name,
-          VariableSymbol,
-        )!;
-
-        symbol.type = promoteRight;
-
-        this.currentScope.change(node.right.name, symbol);
-      } else {
-        node.right.promote!(promoteRight);
-      }
+      node.right = node.right.promote!(promoteRight, this.currentScope as any);
     }
 
     assert(
@@ -405,34 +283,12 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
 
     if (promoteLeft && left !== promoteLeft) {
       left = promoteLeft;
-      if (node.left instanceof AST.VariableAST) {
-        const symbol = this.currentScope.resolve(
-          node.left.name,
-          VariableSymbol,
-        )!;
-
-        symbol.type = promoteLeft;
-
-        this.currentScope.change(node.left.name, symbol);
-      } else {
-        node.left = node.left.promote!(promoteLeft);
-      }
+      node.left = node.left.promote!(promoteLeft, this.currentScope as any);
     }
 
     if (promoteRight && right !== promoteRight) {
       right = promoteRight;
-      if (node.right instanceof AST.VariableAST) {
-        const symbol = this.currentScope.resolve(
-          node.right.name,
-          VariableSymbol,
-        )!;
-
-        symbol.type = promoteRight;
-
-        this.currentScope.change(node.right.name, symbol);
-      } else {
-        node.right.promote!(promoteRight);
-      }
+      node.right = node.right.promote!(promoteRight, this.currentScope as any);
     }
 
     assert(
@@ -458,34 +314,12 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
 
     if (promoteLeft && left !== promoteLeft) {
       left = promoteLeft;
-      if (node.left instanceof AST.VariableAST) {
-        const symbol = this.currentScope.resolve(
-          node.left.name,
-          VariableSymbol,
-        )!;
-
-        symbol.type = promoteLeft;
-
-        this.currentScope.change(node.left.name, symbol);
-      } else {
-        node.left = node.left.promote!(promoteLeft);
-      }
+      node.left = node.left.promote!(promoteLeft, this.currentScope as any);
     }
 
     if (promoteRight && right !== promoteRight) {
       right = promoteRight;
-      if (node.right instanceof AST.VariableAST) {
-        const symbol = this.currentScope.resolve(
-          node.right.name,
-          VariableSymbol,
-        )!;
-
-        symbol.type = promoteRight;
-
-        this.currentScope.change(node.right.name, symbol);
-      } else {
-        node.right.promote!(promoteRight);
-      }
+      node.right = node.right.promote!(promoteRight, this.currentScope as any);
     }
 
     assert(
@@ -510,34 +344,12 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
 
     if (promoteLeft && left !== promoteLeft) {
       left = promoteLeft;
-      if (node.left instanceof AST.VariableAST) {
-        const symbol = this.currentScope.resolve(
-          node.left.name,
-          VariableSymbol,
-        )!;
-
-        symbol.type = promoteLeft;
-
-        this.currentScope.change(node.left.name, symbol);
-      } else {
-        node.left = node.left.promote!(promoteLeft);
-      }
+      node.left = node.left.promote!(promoteLeft, this.currentScope as any);
     }
 
     if (promoteRight && right !== promoteRight) {
       right = promoteRight;
-      if (node.right instanceof AST.VariableAST) {
-        const symbol = this.currentScope.resolve(
-          node.right.name,
-          VariableSymbol,
-        )!;
-
-        symbol.type = promoteRight;
-
-        this.currentScope.change(node.right.name, symbol);
-      } else {
-        node.right.promote!(promoteRight);
-      }
+      node.right = node.right.promote!(promoteRight, this.currentScope as any);
     }
 
     assert(
@@ -562,34 +374,12 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
 
     if (promoteLeft && left !== promoteLeft) {
       left = promoteLeft;
-      if (node.left instanceof AST.VariableAST) {
-        const symbol = this.currentScope.resolve(
-          node.left.name,
-          VariableSymbol,
-        )!;
-
-        symbol.type = promoteLeft;
-
-        this.currentScope.change(node.left.name, symbol);
-      } else {
-        node.left = node.left.promote!(promoteLeft);
-      }
+      node.left = node.left.promote!(promoteLeft, this.currentScope as any);
     }
 
     if (promoteRight && right !== promoteRight) {
       right = promoteRight;
-      if (node.right instanceof AST.VariableAST) {
-        const symbol = this.currentScope.resolve(
-          node.right.name,
-          VariableSymbol,
-        )!;
-
-        symbol.type = promoteRight;
-
-        this.currentScope.change(node.right.name, symbol);
-      } else {
-        node.right.promote!(promoteRight);
-      }
+      node.right = node.right.promote!(promoteRight, this.currentScope as any);
     }
 
     assert(
@@ -614,34 +404,12 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
 
     if (promoteLeft && left !== promoteLeft) {
       left = promoteLeft;
-      if (node.left instanceof AST.VariableAST) {
-        const symbol = this.currentScope.resolve(
-          node.left.name,
-          VariableSymbol,
-        )!;
-
-        symbol.type = promoteLeft;
-
-        this.currentScope.change(node.left.name, symbol);
-      } else {
-        node.left = node.left.promote!(promoteLeft);
-      }
+      node.left = node.left.promote!(promoteLeft, this.currentScope as any);
     }
 
     if (promoteRight && right !== promoteRight) {
       right = promoteRight;
-      if (node.right instanceof AST.VariableAST) {
-        const symbol = this.currentScope.resolve(
-          node.right.name,
-          VariableSymbol,
-        )!;
-
-        symbol.type = promoteRight;
-
-        this.currentScope.change(node.right.name, symbol);
-      } else {
-        node.right.promote!(promoteRight);
-      }
+      node.right = node.right.promote!(promoteRight, this.currentScope as any);
     }
 
     assert(
@@ -666,34 +434,12 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
 
     if (promoteLeft && left !== promoteLeft) {
       left = promoteLeft;
-      if (node.left instanceof AST.VariableAST) {
-        const symbol = this.currentScope.resolve(
-          node.left.name,
-          VariableSymbol,
-        )!;
-
-        symbol.type = promoteLeft;
-
-        this.currentScope.change(node.left.name, symbol);
-      } else {
-        node.left = node.left.promote!(promoteLeft);
-      }
+      node.left = node.left.promote!(promoteLeft, this.currentScope as any);
     }
 
     if (promoteRight && right !== promoteRight) {
       right = promoteRight;
-      if (node.right instanceof AST.VariableAST) {
-        const symbol = this.currentScope.resolve(
-          node.right.name,
-          VariableSymbol,
-        )!;
-
-        symbol.type = promoteRight;
-
-        this.currentScope.change(node.right.name, symbol);
-      } else {
-        node.right.promote!(promoteRight);
-      }
+      node.right = node.right.promote!(promoteRight, this.currentScope as any);
     }
 
     assert(
@@ -718,34 +464,12 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
 
     if (promoteLeft && left !== promoteLeft) {
       left = promoteLeft;
-      if (node.left instanceof AST.VariableAST) {
-        const symbol = this.currentScope.resolve(
-          node.left.name,
-          VariableSymbol,
-        )!;
-
-        symbol.type = promoteLeft;
-
-        this.currentScope.change(node.left.name, symbol);
-      } else {
-        node.left = node.left.promote!(promoteLeft);
-      }
+      node.left = node.left.promote!(promoteLeft, this.currentScope as any);
     }
 
     if (promoteRight && right !== promoteRight) {
       right = promoteRight;
-      if (node.right instanceof AST.VariableAST) {
-        const symbol = this.currentScope.resolve(
-          node.right.name,
-          VariableSymbol,
-        )!;
-
-        symbol.type = promoteRight;
-
-        this.currentScope.change(node.right.name, symbol);
-      } else {
-        node.right.promote!(promoteRight);
-      }
+      node.right = node.right.promote!(promoteRight, this.currentScope as any);
     }
 
     assert(
@@ -903,7 +627,7 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
             overloads[0].args[i].name
           }' να είναι τύπου ${Types.printType(mismatches[0])}${mismatches
             .slice(1)
-            .map(type => ` ή ${Types.printType(type)}`)
+            .map((type) => ` ή ${Types.printType(type)}`)
             .join('')}, αλλά έλαβα μη συμβατό τύπο ${Types.printType(arg)}`,
         );
       }
@@ -1054,7 +778,7 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
       );
     }
 
-    node.args.forEach(arg => {
+    node.args.forEach((arg) => {
       const argType = this.visit(arg);
       if (!Types.canBeRead(argType)) {
         throw new GLOError(
@@ -1075,7 +799,7 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
       );
     }
 
-    node.args.forEach(arg => {
+    node.args.forEach((arg) => {
       const argType = this.visit(arg);
       if (!Types.canBeWritten(argType)) {
         throw new GLOError(

@@ -10,7 +10,7 @@ import {
   printType,
 } from '@glossa-glo/data-types';
 import GLOError from '@glossa-glo/error';
-import { FunctionSymbol, VariableSymbol } from '../symbol';
+import { VariableSymbol } from '../symbol';
 import { SymbolScopeType } from './SymbolScopeType';
 
 export default abstract class SymbolScope {
@@ -85,7 +85,7 @@ export default abstract class SymbolScope {
     scope.value.set(name, value);
   }
 
-  public change(name: string, value: GLOSymbol) {
+  public change(name: string, value: GLOSymbol): void {
     const scope = this.findScope(name);
 
     if (!scope) {
@@ -112,7 +112,7 @@ export default abstract class SymbolScope {
     return this.parent;
   }
 
-  public insert(symbol: GLOSymbol) {
+  public insert(symbol: GLOSymbol): void {
     if (this.has(symbol)) {
       throw new GLOError(
         symbol,

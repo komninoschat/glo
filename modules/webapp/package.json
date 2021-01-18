@@ -31,7 +31,6 @@
     "nuxt": "^2.14.0",
     "nuxt-webfontloader": "^1.1.0",
     "reset-css": "^4.0.1",
-    "ts-node": "^8.10.1",
     "v-click-outside": "^3.1.2",
     "vue": "^2.6.11",
     "vue-codemirror": "^4.0.6",

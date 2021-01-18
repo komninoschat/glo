@@ -1,4 +1,6 @@
+import { GLODataType } from '@glossa-glo/data-types';
 import AST from './AST';
+import type { SymbolScope } from '@glossa-glo/symbol';
 
 export default abstract class BinaryAST<
   L extends AST = AST,
@@ -31,6 +33,12 @@ export default abstract class BinaryAST<
     }
     this.addChild(value);
     this._right = value;
+  }
+
+  public promote(target: typeof GLODataType, scope: SymbolScope) {
+    this._left = this._left.promote!(target, scope) as any;
+    this._right = this._right.promote!(target, scope) as any;
+    return this;
   }
 
   constructor(left: L, right: R) {
