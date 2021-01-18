@@ -237,7 +237,7 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
       )}`,
     );
 
-    return Types.GLOReal;
+    return left;
   }
 
   public visitMod(node: AST.ModAST) {
