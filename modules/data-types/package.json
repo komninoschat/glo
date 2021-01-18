@@ -1,6 +1,6 @@
 {
   "name": "@glossa-glo/data-types",
-  "version": "4.2.0-beta",
+  "version": "4.2.7-beta",
   "description": "GLO Data types",
   "author": "komninoschat <komninoschat@gmail.com>",
   "homepage": "https://github.com/komninoschat/glo#readme",
@@ -30,7 +30,7 @@
     "url": "https://github.com/komninoschat/glo/issues"
   },
   "dependencies": {
-    "@glossa-glo/error": "^4.2.0-beta",
+    "@glossa-glo/error": "^4.2.7-beta",
     "typescript": "^4.1.3"
   },
   "devDependencies": {
