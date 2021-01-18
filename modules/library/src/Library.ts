@@ -22,10 +22,10 @@ export class LibraryFunction {
   ) {
     this.functionSymbol = new FunctionSymbol(
       name,
-      types[0].args.map(arg => new VariableSymbol(arg[0], arg[1])),
+      types[0].args.map((arg) => new VariableSymbol(arg[0], arg[1])),
       types[0].returnType,
-      types.slice(1).map(type => ({
-        args: type.args.map(arg => new VariableSymbol(arg[0], arg[1])),
+      types.slice(1).map((type) => ({
+        args: type.args.map((arg) => new VariableSymbol(arg[0], arg[1])),
         returnType: type.returnType,
       })),
     );

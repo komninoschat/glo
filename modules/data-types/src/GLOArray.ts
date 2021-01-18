@@ -34,7 +34,7 @@ export default function createGLOArray(
     // TODO: Make more efficient, allow n-dimensional arrays
     arrayPrint() {
       function flatten<T>(arr: any[]): T {
-        return arr.reduce(function(flat, toFlatten) {
+        return arr.reduce(function (flat, toFlatten) {
           return flat.concat(
             Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten,
           );
@@ -53,7 +53,7 @@ export default function createGLOArray(
           return { print: arr, dimensionLength: this.dimensionLength };
         } else {
           const maxIndex = Math.max(
-            ...Object.keys(this.value).map(key => parseInt(key)),
+            ...Object.keys(this.value).map((key) => parseInt(key)),
             1,
           );
           arr = new Array(maxIndex);
@@ -79,13 +79,13 @@ export default function createGLOArray(
           return { print: arr, dimensionLength: this.dimensionLength };
         } else {
           const maxIndex = Math.max(
-            ...Object.keys(this.value).map(key => parseInt(key)),
+            ...Object.keys(this.value).map((key) => parseInt(key)),
             1,
           );
           const maxIndex2 = Math.max(
             ...flatten<number[]>(
-              Object.values<any>(this.value).map(val =>
-                Object.keys(val).map(key => parseInt(key)),
+              Object.values<any>(this.value).map((val) =>
+                Object.keys(val).map((key) => parseInt(key)),
               ),
             ),
             1,

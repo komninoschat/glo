@@ -18,7 +18,7 @@ export default class SimplifyConstants extends AST.GlossaASTVisitorWithDefault<T
     super();
   }
 
-  private withLocalScope(name: string, type: SymbolScopeType, fn: Function) {
+  private withLocalScope(name: string, type: SymbolScopeType, fn: () => void) {
     this.localScope = new LocalSymbolScope(name, type, this.baseScope);
     fn();
     this.localScope = null;
@@ -109,7 +109,7 @@ export default class SimplifyConstants extends AST.GlossaASTVisitorWithDefault<T
   }
 
   public visitFunctionCall(node: AST.FunctionCallAST) {
-    const args = node.args.map(arg => this.visit(arg));
+    const args = node.args.map((arg) => this.visit(arg));
     const func = this.baseScope.resolveValue<Types.GLOFunction>(node.name);
 
     if (!func) {

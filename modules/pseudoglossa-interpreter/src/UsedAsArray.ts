@@ -16,7 +16,7 @@ export default class UsedAsArray extends PseudoglossaASTVisitorWithDefault {
   }
 
   visitArrayAccess(node: ArrayAccessAST) {
-    if (!this.usedAsArray.find(a => a.name == node.array.name))
+    if (!this.usedAsArray.find((a) => a.name == node.array.name))
       this.usedAsArray.push({
         name: node.array.name,
         dimensions: node.accessors.length,

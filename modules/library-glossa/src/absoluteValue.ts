@@ -9,7 +9,7 @@ export default new LibraryFunction(
     { args: [['τιμή', GLOInteger]], returnType: GLOInteger },
     { args: [['τιμή', GLOReal]], returnType: GLOReal },
   ],
-  args => {
+  (args) => {
     const value = (args[0] as GLOReal | GLOInteger).value;
 
     return args[0] instanceof GLOInteger

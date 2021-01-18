@@ -4,7 +4,7 @@ import { LibraryFunction } from '@glossa-glo/library';
 export default new LibraryFunction(
   'ΣΥΝ',
   [{ args: [['μοίρες', GLOReal]], returnType: GLOReal }],
-  args => {
+  (args) => {
     const value = (args[0] as GLOReal).value;
 
     const degrees = (value * Math.PI) / 180;
