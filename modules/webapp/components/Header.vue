@@ -60,11 +60,13 @@
       )
       ButtonDropdown.more-options(
         :color="!darkmode ? 'black' : 'white'"
-        :menu="[ ['Αποθήκευση', 'Download'], ['Animate', 'Animate'], ['Copyright', 'Copyright'], ['Επικοινωνία', 'Contact'] ]"
+        :menu="dropdownMenu"
         @clickDownload="download"
         @clickAnimate="toggleAnimate"
-        @clickCopyright="openCopyright"
-        @clickContact="openContact"
+        @clickInformation="openInformation"
+        @clickGlossa="openGlossa"
+        @clickPseudoglossa="openPseudoglossa"
+        @clickFlash="openFlash"
       )
       ButtonSecondary.fullscreen(
         @click.native="toggleFullscreen"
@@ -256,16 +258,33 @@ export default class Header extends Vue {
   @Emit('increaseFontSize')
   increaseFontSize() {}
 
-  openCopyright() {
-    window.location.href = '/copyright.html';
+  openInformation() {
+    window.location.href = '/info.html';
   }
 
-  openContact() {
-    window.location.href = '/contact.html';
+  openFlash() {
+    window.location.href = 'http://pseudoglossa.skepto.gr'
+  }
+
+  openGlossa() {
+    window.location.href = 'http://gloglossa.gr'
+  }
+
+  openPseudoglossa() {
+    window.location.href = 'http://pseudo.gloglossa.gr'
   }
 
   img(filename: string) {
     return require(`../assets/img/${filename}`)
+  }
+
+  dropdownMenu = [ ['Αποθήκευση', 'Download'], ['Animate', 'Animate'], ['Πληροφορίες', 'Information'] ];
+
+  mounted() {
+    if(this.isPseudoglossa) this.dropdownMenu.push(['Flash', 'Flash'])
+
+    if(!this.isPseudoglossa) this.dropdownMenu.push(['Ψευδογλώσσα', 'Pseudoglossa'])
+    else this.dropdownMenu.push(['Γλώσσα', 'Glossa'])
   }
 }
 </script>
