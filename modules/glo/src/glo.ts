@@ -6,6 +6,7 @@ import {
   SymbolBuilder,
   TypeChecker,
   SimplifyConstants,
+  ConstantsTypeChecker,
 } from '@glossa-glo/semantic-analyzer';
 import { BaseSymbolScope, SymbolScope } from '@glossa-glo/symbol';
 import injectLibraryToScope from '@glossa-glo/library-glossa';
@@ -31,6 +32,7 @@ export default async function interpret(
   const tree = new Parser(lexer).run();
   const baseScope = new BaseSymbolScope('root');
   injectLibraryToScope(baseScope);
+  new ConstantsTypeChecker(tree, baseScope).run();
   new SimplifyConstants(tree, baseScope).run();
   new SymbolBuilder(tree, baseScope).run();
   new TypeChecker(tree, baseScope).run();
