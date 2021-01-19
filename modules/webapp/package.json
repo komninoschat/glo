@@ -1,6 +1,6 @@
 {
   "name": "@glossa-glo/webapp",
-  "version": "5.0.3-beta",
+  "version": "5.0.4-beta",
   "description": "Glo webapp",
   "author": "komninoschat",
   "private": true,
@@ -17,7 +17,7 @@
     "@fortawesome/vue-fontawesome": "2",
     "@glossa-glo/ast": "^5.0.1-beta",
     "@glossa-glo/error": "^4.2.7-beta",
-    "@glossa-glo/glo": "^5.0.1-beta",
+    "@glossa-glo/glo": "^5.0.4-beta",
     "@glossa-glo/interpreter": "^5.0.1-beta",
     "@glossa-glo/ps": "^5.0.1-beta",
     "@glossa-glo/pseudoglossa-interpreter": "^5.0.1-beta",
