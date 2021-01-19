@@ -1411,19 +1411,28 @@ export class Parser {
   }
 
   private and(): AST.AST {
-    let current = this.comparison();
+    let current = this.not();
 
     while (this.currentToken instanceof Lexer.AndToken) {
       const andToken = Object.assign({}, this.currentToken);
 
       this.currentToken = this.eat(Lexer.AndToken);
 
-      current = new AST.AndAST(current, this.comparison()).inheritPositionFrom(
+      current = new AST.AndAST(current, this.not()).inheritPositionFrom(
         andToken,
       );
     }
 
     return current;
+  }
+
+  private not(): AST.AST {
+    if (this.currentToken instanceof Lexer.NotToken) {
+      const notToken = Object.assign({}, this.currentToken);
+      this.currentToken = this.eat(Lexer.NotToken);
+
+      return new AST.NotAST(this.comparison()).inheritPositionFrom(notToken);
+    } else return this.comparison();
   }
 
   private comparison() {
@@ -1559,7 +1568,7 @@ export class Parser {
     const savedToken = Object.assign({}, this.currentToken);
 
     if (this.currentToken instanceof Lexer.PlusToken) {
-      this.currentToken = this.eat(Lexer.MinusToken);
+      this.currentToken = this.eat(Lexer.PlusToken);
       const atom = this.atom();
       return new AST.UnaryPlusAST(atom).inheritPositionFrom({
         start: {
@@ -1605,9 +1614,6 @@ export class Parser {
       const str = this.currentToken.value;
       this.currentToken = this.eat(Lexer.StringConstantToken);
       return new AST.StringConstantAST(str).inheritPositionFrom(savedToken);
-    } else if (this.currentToken instanceof Lexer.NotToken) {
-      this.currentToken = this.eat(Lexer.NotToken);
-      return new AST.NotAST(this.atom()).inheritPositionFrom(savedToken);
     } else if (
       this.currentToken instanceof Lexer.IdToken &&
       this.peek() instanceof Lexer.OpeningBracketToken

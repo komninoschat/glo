@@ -123,7 +123,11 @@ expression
   ;
 
 and:
-  : comparison ("ΚΑΙ" comparison)*
+  : not ("ΚΑΙ" not)*
+  ;
+
+not
+  : "ΟΧΙ"? comparison
   ;
 
 comparison:
@@ -153,7 +157,6 @@ atom
   | "ΑΛΗΘΗΣ"
   | "ΨΕΥΔΗΣ"
   | string_expression
-  | "ΟΧΙ" atom
   ;
 
 call_function
