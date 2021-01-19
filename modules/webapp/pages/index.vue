@@ -1,5 +1,5 @@
 <template lang="pug">
-  .page(ref="page" @change="fullscreenChange")
+  .page(ref="page" @change="fullscreenChange" :class="darkmode ? 'darkmode' : ''")
     Header(
       :interpreting="interpreting"
       :stepInterpreting="stepInterpreting"
@@ -62,7 +62,7 @@
           v-else
         ) {{ c.message }}
       .prompt(v-show="showPrompt")
-        span(:style="{fontSize}" v-if="promptLabel") {{ promptLabel }}
+        span.prompt-label(:style="{fontSize}" v-if="promptLabel") {{ promptLabel }}
         input.prompt-input(
           rf="readInput"
           v-model="promptValue"
@@ -93,6 +93,8 @@ symbol-scope-width = 300px
 .page
   background white
   position relative
+  &.darkmode
+    background black
 
 .editor
   height "calc(100vh - %s - %s)" % (header-height console-height)
@@ -187,6 +189,8 @@ symbol-scope-width = 300px
       color rgba(190,190,190,0.6)
     .read-input
       background read-color-dark
+    .prompt-label
+      color black
 </style>
 
 <script lang="ts">
@@ -328,6 +332,13 @@ export default class InterpreterPage extends Vue {
   }
 
   download() {
+    const regexProgramName = this.sourceCode.toLowerCase().match(
+      !this.isPseudoglossa ? /(πρόγραμμα|προγραμμα) ([α-ωΑ-ΩίϊΐόάέύϋΰήώΊΪΪ́ΌΆΈΎΫΫ́ΉΏa-zA-Z0-9_]+)/
+                           : /(αλγόριθμος|αλγοριθμος) ([α-ωΑ-ΩίϊΐόάέύϋΰήώΊΪΪ́ΌΆΈΎΫΫ́ΉΏa-zA-Z0-9_]+)/
+    )
+
+    const programName = regexProgramName ? regexProgramName![2] : 'program';
+
     const blob = new Blob([
         new Uint8Array([0xEF, 0xBB, 0xBF]), // UTF-8 BOM
         this.sourceCode
@@ -338,7 +349,7 @@ export default class InterpreterPage extends Vue {
     const a = document.createElement('a');
     a.style.display = 'none';
     a.href = url;
-    a.download = 'program.glo';
+    a.download = `${programName}.${!this.isPseudoglossa ? 'glo' : 'ps'}`;
     document.body.appendChild(a);
     a.click();
     URL.revokeObjectURL(url);
