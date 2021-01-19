@@ -1559,7 +1559,7 @@ export class Parser {
     const savedToken = Object.assign({}, this.currentToken);
 
     if (this.currentToken instanceof Lexer.PlusToken) {
-      this.currentToken = this.eat(Lexer.MinusToken);
+      this.currentToken = this.eat(Lexer.PlusToken);
       const atom = this.atom();
       return new AST.UnaryPlusAST(atom).inheritPositionFrom({
         start: {
