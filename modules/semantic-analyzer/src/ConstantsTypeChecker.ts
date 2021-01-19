@@ -10,19 +10,26 @@ import {
   FunctionSymbol,
   SymbolScopeType,
   FunctionOverload,
+  LocalSymbolScope,
 } from '@glossa-glo/symbol';
 import GLOError, { assert, assertEquality } from '@glossa-glo/error';
 
-export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
-  typeof Types.GLODataType
+export default class ConstantsTypeChecker extends AST.GlossaASTVisitorWithDefault<
+  typeof Types.GLODataType | null
 > {
-  private currentScope: SymbolScope;
-  private throwOnIOVisit = false;
-  private throwOnIOVisitErrorMessageSuffix = '';
+  private localScope: LocalSymbolScope | null = null;
 
-  constructor(protected readonly ast: AST.AST, baseScope: BaseSymbolScope) {
+  constructor(
+    protected readonly ast: AST.AST,
+    private readonly baseScope: BaseSymbolScope,
+  ) {
     super();
-    this.currentScope = baseScope;
+  }
+
+  private withLocalScope(name: string, type: SymbolScopeType, fn: () => void) {
+    this.localScope = new LocalSymbolScope(name, type, this.baseScope);
+    fn();
+    this.localScope = null;
   }
 
   public visitIntegerConstant(node: AST.IntegerConstantAST) {
@@ -46,22 +53,10 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
   }
 
   public visitVariable(node: AST.VariableAST, assignee = false) {
-    const symbol = this.currentScope.resolve(node.name)!;
-
-    if (symbol instanceof VariableSymbol) {
-      return symbol.type;
-    } else if (
-      symbol instanceof FunctionSymbol &&
-      this.currentScope.type === SymbolScopeType.Function && // Is inside function
-      this.currentScope.nameEquals(node.name) && // Variable name matches function name
-      assignee // Variable the left side of an assignment expression
-    ) {
-      return symbol.returnType;
-    } else
-      throw new GLOError(
-        node,
-        'Program error: Attempted to type check non variable or function',
-      );
+    if (this.localScope && this.localScope.resolveValue(node.name)) {
+      return this.localScope.resolveValue(node.name)!
+        .constructor as typeof Types.GLODataType;
+    } else return null;
   }
 
   public visitAssignment(node: AST.AssignmentAST) {
@@ -69,9 +64,11 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
       node.left instanceof AST.VariableAST
         ? this.visitVariable(node.left, true)
         : this.visit(node.left);
-    let right = this.visit(node.right);
+    const right = this.visit(node.right);
 
-    const { promoteRight } = assertTypeEquality({
+    if (!left || !right) return null;
+
+    assertTypeEquality({
       node,
       left,
       right,
@@ -83,33 +80,20 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
       } τύπου LEFT_TYPE`,
     });
 
-    if (promoteRight && right !== promoteRight) {
-      right = promoteRight;
-      node.right = node.right.promote!(promoteRight, this.currentScope as any);
-    }
-
     return left;
   }
 
   public visitIntegerDivision(node: AST.IntegerDivisionAST) {
-    let left = this.visit(node.left);
-    let right = this.visit(node.right);
+    const left = this.visit(node.left);
+    const right = this.visit(node.right);
 
-    const { promoteLeft, promoteRight } = assertTypeEquality({
+    if (!left || !right) return null;
+
+    assertTypeEquality({
       node,
       left,
       right,
     });
-
-    if (promoteLeft && left !== promoteLeft) {
-      left = promoteLeft;
-      node.left = node.left.promote!(promoteLeft, this.currentScope as any);
-    }
-
-    if (promoteRight && right !== promoteRight) {
-      right = promoteRight;
-      node.right = node.right.promote!(promoteRight, this.currentScope as any);
-    }
 
     assert(
       node,
@@ -123,24 +107,16 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
   }
 
   public visitRealDivision(node: AST.RealDivisionAST) {
-    let left = this.visit(node.left);
-    let right = this.visit(node.right);
+    const left = this.visit(node.left);
+    const right = this.visit(node.right);
 
-    const { promoteLeft, promoteRight } = assertTypeEquality({
+    if (!left || !right) return null;
+
+    assertTypeEquality({
       node,
       left,
       right,
     });
-
-    if (promoteLeft && left !== promoteLeft) {
-      left = promoteLeft;
-      node.left = node.left.promote!(promoteLeft, this.currentScope as any);
-    }
-
-    if (promoteRight && right !== promoteRight) {
-      right = promoteRight;
-      node.right = node.right.promote!(promoteRight, this.currentScope as any);
-    }
 
     assert(
       node,
@@ -154,24 +130,16 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
   }
 
   public visitMinus(node: AST.MinusAST) {
-    let left = this.visit(node.left);
-    let right = this.visit(node.right);
+    const left = this.visit(node.left);
+    const right = this.visit(node.right);
 
-    const { promoteLeft, promoteRight } = assertTypeEquality({
+    if (!left || !right) return null;
+
+    assertTypeEquality({
       node,
       left,
       right,
     });
-
-    if (promoteLeft && left !== promoteLeft) {
-      left = promoteLeft;
-      node.left = node.left.promote!(promoteLeft, this.currentScope as any);
-    }
-
-    if (promoteRight && right !== promoteRight) {
-      right = promoteRight;
-      node.right = node.right.promote!(promoteRight, this.currentScope as any);
-    }
 
     assert(
       node,
@@ -185,24 +153,16 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
   }
 
   public visitMultiplication(node: AST.MultiplicationAST) {
-    let left = this.visit(node.left);
-    let right = this.visit(node.right);
+    const left = this.visit(node.left);
+    const right = this.visit(node.right);
 
-    const { promoteLeft, promoteRight } = assertTypeEquality({
+    if (!left || !right) return null;
+
+    assertTypeEquality({
       node,
       left,
       right,
     });
-
-    if (promoteLeft && left !== promoteLeft) {
-      left = promoteLeft;
-      node.left = node.left.promote!(promoteLeft, this.currentScope as any);
-    }
-
-    if (promoteRight && right !== promoteRight) {
-      right = promoteRight;
-      node.right = node.right.promote!(promoteRight, this.currentScope as any);
-    }
 
     assert(
       node,
@@ -216,24 +176,16 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
   }
 
   public visitExponentiation(node: AST.ExponentiationAST) {
-    let left = this.visit(node.left);
-    let right = this.visit(node.right);
+    const left = this.visit(node.left);
+    const right = this.visit(node.right);
 
-    const { promoteLeft, promoteRight } = assertTypeEquality({
+    if (!left || !right) return null;
+
+    assertTypeEquality({
       node,
       left,
       right,
     });
-
-    if (promoteLeft && left !== promoteLeft) {
-      left = promoteLeft;
-      node.left = node.left.promote!(promoteLeft, this.currentScope as any);
-    }
-
-    if (promoteRight && right !== promoteRight) {
-      right = promoteRight;
-      node.right = node.right.promote!(promoteRight, this.currentScope as any);
-    }
 
     assert(
       node,
@@ -247,24 +199,16 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
   }
 
   public visitMod(node: AST.ModAST) {
-    let left = this.visit(node.left);
-    let right = this.visit(node.right);
+    const left = this.visit(node.left);
+    const right = this.visit(node.right);
 
-    const { promoteLeft, promoteRight } = assertTypeEquality({
+    if (!left || !right) return null;
+
+    assertTypeEquality({
       node,
       left,
       right,
     });
-
-    if (promoteLeft && left !== promoteLeft) {
-      left = promoteLeft;
-      node.left = node.left.promote!(promoteLeft, this.currentScope as any);
-    }
-
-    if (promoteRight && right !== promoteRight) {
-      right = promoteRight;
-      node.right = node.right.promote!(promoteRight, this.currentScope as any);
-    }
 
     assert(
       node,
@@ -278,24 +222,16 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
   }
 
   public visitPlus(node: AST.PlusAST) {
-    let left = this.visit(node.left);
-    let right = this.visit(node.right);
+    const left = this.visit(node.left);
+    const right = this.visit(node.right);
 
-    const { promoteLeft, promoteRight } = assertTypeEquality({
+    if (!left || !right) return null;
+
+    assertTypeEquality({
       node,
       left,
       right,
     });
-
-    if (promoteLeft && left !== promoteLeft) {
-      left = promoteLeft;
-      node.left = node.left.promote!(promoteLeft, this.currentScope as any);
-    }
-
-    if (promoteRight && right !== promoteRight) {
-      right = promoteRight;
-      node.right = node.right.promote!(promoteRight, this.currentScope as any);
-    }
 
     assert(
       node,
@@ -309,24 +245,16 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
   }
 
   public visitEquals(node: AST.EqualsAST) {
-    let left = this.visit(node.left);
-    let right = this.visit(node.right);
+    const left = this.visit(node.left);
+    const right = this.visit(node.right);
 
-    const { promoteLeft, promoteRight } = assertTypeEquality({
+    if (!left || !right) return null;
+
+    assertTypeEquality({
       node,
       left,
       right,
     });
-
-    if (promoteLeft && left !== promoteLeft) {
-      left = promoteLeft;
-      node.left = node.left.promote!(promoteLeft, this.currentScope as any);
-    }
-
-    if (promoteRight && right !== promoteRight) {
-      right = promoteRight;
-      node.right = node.right.promote!(promoteRight, this.currentScope as any);
-    }
 
     assert(
       node,
@@ -339,24 +267,16 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
     return Types.GLOBoolean;
   }
   public visitNotEquals(node: AST.NotEqualsAST) {
-    let left = this.visit(node.left);
-    let right = this.visit(node.right);
+    const left = this.visit(node.left);
+    const right = this.visit(node.right);
 
-    const { promoteLeft, promoteRight } = assertTypeEquality({
+    if (!left || !right) return null;
+
+    assertTypeEquality({
       node,
       left,
       right,
     });
-
-    if (promoteLeft && left !== promoteLeft) {
-      left = promoteLeft;
-      node.left = node.left.promote!(promoteLeft, this.currentScope as any);
-    }
-
-    if (promoteRight && right !== promoteRight) {
-      right = promoteRight;
-      node.right = node.right.promote!(promoteRight, this.currentScope as any);
-    }
 
     assert(
       node,
@@ -369,24 +289,16 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
     return Types.GLOBoolean;
   }
   public visitGreaterThan(node: AST.GreaterThanAST) {
-    let left = this.visit(node.left);
-    let right = this.visit(node.right);
+    const left = this.visit(node.left);
+    const right = this.visit(node.right);
 
-    const { promoteLeft, promoteRight } = assertTypeEquality({
+    if (!left || !right) return null;
+
+    assertTypeEquality({
       node,
       left,
       right,
     });
-
-    if (promoteLeft && left !== promoteLeft) {
-      left = promoteLeft;
-      node.left = node.left.promote!(promoteLeft, this.currentScope as any);
-    }
-
-    if (promoteRight && right !== promoteRight) {
-      right = promoteRight;
-      node.right = node.right.promote!(promoteRight, this.currentScope as any);
-    }
 
     assert(
       node,
@@ -399,24 +311,16 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
     return Types.GLOBoolean;
   }
   public visitLessThan(node: AST.LessThanAST) {
-    let left = this.visit(node.left);
-    let right = this.visit(node.right);
+    const left = this.visit(node.left);
+    const right = this.visit(node.right);
 
-    const { promoteLeft, promoteRight } = assertTypeEquality({
+    if (!left || !right) return null;
+
+    assertTypeEquality({
       node,
       left,
       right,
     });
-
-    if (promoteLeft && left !== promoteLeft) {
-      left = promoteLeft;
-      node.left = node.left.promote!(promoteLeft, this.currentScope as any);
-    }
-
-    if (promoteRight && right !== promoteRight) {
-      right = promoteRight;
-      node.right = node.right.promote!(promoteRight, this.currentScope as any);
-    }
 
     assert(
       node,
@@ -429,24 +333,16 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
     return Types.GLOBoolean;
   }
   public visitGreaterEquals(node: AST.GreaterEqualsAST) {
-    let left = this.visit(node.left);
-    let right = this.visit(node.right);
+    const left = this.visit(node.left);
+    const right = this.visit(node.right);
 
-    const { promoteLeft, promoteRight } = assertTypeEquality({
+    if (!left || !right) return null;
+
+    assertTypeEquality({
       node,
       left,
       right,
     });
-
-    if (promoteLeft && left !== promoteLeft) {
-      left = promoteLeft;
-      node.left = node.left.promote!(promoteLeft, this.currentScope as any);
-    }
-
-    if (promoteRight && right !== promoteRight) {
-      right = promoteRight;
-      node.right = node.right.promote!(promoteRight, this.currentScope as any);
-    }
 
     assert(
       node,
@@ -459,24 +355,16 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
     return Types.GLOBoolean;
   }
   public visitLessEquals(node: AST.LessEqualsAST) {
-    let left = this.visit(node.left);
-    let right = this.visit(node.right);
+    const left = this.visit(node.left);
+    const right = this.visit(node.right);
 
-    const { promoteLeft, promoteRight } = assertTypeEquality({
+    if (!left || !right) return null;
+
+    assertTypeEquality({
       node,
       left,
       right,
     });
-
-    if (promoteLeft && left !== promoteLeft) {
-      left = promoteLeft;
-      node.left = node.left.promote!(promoteLeft, this.currentScope as any);
-    }
-
-    if (promoteRight && right !== promoteRight) {
-      right = promoteRight;
-      node.right = node.right.promote!(promoteRight, this.currentScope as any);
-    }
 
     assert(
       node,
@@ -491,6 +379,8 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
   public visitAnd(node: AST.AndAST) {
     const left = this.visit(node.left);
     const right = this.visit(node.right);
+
+    if (!left || !right) return null;
 
     assertEquality(
       node,
@@ -515,6 +405,8 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
     const left = this.visit(node.left);
     const right = this.visit(node.right);
 
+    if (!left || !right) return null;
+
     assertEquality(
       node,
       left,
@@ -538,6 +430,8 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
   public visitNot(node: AST.NotAST) {
     const target = this.visit(node.target);
 
+    if (!target) return null;
+
     assertEquality(
       node,
       target,
@@ -553,6 +447,8 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
   public visitUnaryMinus(node: AST.UnaryMinusAST) {
     const target = this.visit(node.target);
 
+    if (!target) return null;
+
     assert(
       node,
       target.prototype.unaryMinus,
@@ -567,6 +463,8 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
   public visitUnaryPlus(node: AST.UnaryPlusAST) {
     const target = this.visit(node.target);
 
+    if (!target) return null;
+
     assert(
       node,
       target.prototype.unaryPlus(),
@@ -579,55 +477,46 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
   }
 
   public visitProgram(node: AST.ProgramAST) {
-    this.currentScope = this.currentScope.children.get(node.name)!;
+    this.withLocalScope(node.name, SymbolScopeType.Program, () => {
+      this.visitMultiple(node.declarations);
+      this.visitMultiple(node.statementList);
+    });
 
-    this.visitMultiple(node.declarations);
-    this.visitMultiple(node.statementList);
-
-    this.currentScope = this.currentScope.getParent()!;
-    return Types.GLOVoid;
+    return null;
   }
 
   public visitProcedureDeclaration(node: AST.ProcedureDeclarationAST) {
-    this.currentScope = this.currentScope.children.get(node.name.name)!;
-
-    this.visitMultiple(node.constantDeclarations);
-    this.visitMultiple(node.variableDeclarations);
-    this.visitMultiple(node.statementList);
-
-    this.currentScope = this.currentScope.getParent()!;
-    return Types.GLOVoid;
+    this.withLocalScope(node.name.name, SymbolScopeType.Procedure, () => {
+      this.visitMultiple(node.children);
+    });
+    return null;
   }
 
   public visitFunctionCall(node: AST.FunctionCallAST) {
-    const symbol = this.currentScope.resolve<typeof FunctionSymbol>(node.name)!;
+    const symbol = this.baseScope.resolve<typeof FunctionSymbol>(node.name);
+
+    if (!symbol) return null;
 
     const overloads: {
       0: FunctionOverload;
     } & FunctionOverload[] = [symbol, ...symbol.overloads];
 
     for (let i = 0; i < node.args.length; i++) {
-      let argAST = node.args[i];
-      let arg = this.visit(argAST);
+      const argAST = node.args[i];
+      const arg = this.visit(argAST);
+
+      if (!arg) continue;
 
       const mismatches: typeof Types.GLODataType[] = [];
 
       for (const overload of overloads) {
         try {
-          const { promoteRight } = assertTypeEquality({
+          assertTypeEquality({
             node: argAST,
             left: overload.args[i].type,
             right: arg,
             allowPromoteLeft: false,
           });
-
-          if (promoteRight && arg !== promoteRight) {
-            arg = promoteRight;
-            argAST = node.args[i] = node.args[i].promote!(
-              promoteRight,
-              this.currentScope as any,
-            );
-          }
           break;
         } catch {
           mismatches.push(overload.args[i].type);
@@ -650,39 +539,11 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
     return symbol.returnType;
   }
 
-  public visitProcedureCall(node: AST.ProcedureCallAST) {
-    const symbol = this.currentScope.resolve<typeof ProcedureSymbol>(
-      node.name,
-    )!;
-
-    symbol.args.forEach(
-      ({ type: declarationType, name: argDeclarationName }, i) => {
-        let argAST = node.args[i];
-        let arg = this.visit(argAST);
-
-        const { promoteRight } = assertTypeEquality({
-          node: argAST,
-          left: declarationType,
-          right: arg,
-          allowPromoteLeft: false,
-          message: `Περίμενα την παράμετρο '${argDeclarationName}' να είναι τύπου LEFT_TYPE, αλλά έλαβα μη συμβατό τύπο RIGHT_TYPE`,
-        });
-
-        if (promoteRight && arg !== promoteRight) {
-          arg = promoteRight;
-          argAST = node.args[i] = node.args[i].promote!(
-            promoteRight,
-            this.currentScope as any,
-          );
-        }
-      },
-    );
-
-    return Types.GLOVoid;
-  }
-
   public visitFor(node: AST.ForAST) {
     const counterType = this.visit(node.counter);
+
+    if (!counterType) return null;
+
     assertEquality(
       node.counter,
       counterType,
@@ -693,6 +554,9 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
     );
 
     const startValueType = this.visit(node.startValue);
+
+    if (!startValueType) return null;
+
     assertEquality(
       node.startValue,
       startValueType,
@@ -703,6 +567,9 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
     );
 
     const endValueType = this.visit(node.endValue);
+
+    if (!endValueType) return null;
+
     assertEquality(
       node.endValue,
       endValueType,
@@ -713,6 +580,9 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
     );
 
     const stepType = this.visit(node.step);
+
+    if (!stepType) return null;
+
     assertEquality(
       node.step,
       stepType,
@@ -728,6 +598,9 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
 
   public visitWhile(node: AST.WhileAST) {
     const conditionType = this.visit(node.condition);
+
+    if (!conditionType) return null;
+
     assertEquality(
       node.condition,
       conditionType,
@@ -743,6 +616,9 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
 
   public visitRepeat(node: AST.RepeatAST) {
     const conditionType = this.visit(node.condition);
+
+    if (!conditionType) return null;
+
     assertEquality(
       node.condition,
       conditionType,
@@ -756,87 +632,16 @@ export default class TypeChecker extends AST.GlossaASTVisitorWithDefault<
     return Types.GLOVoid;
   }
 
-  public visitArrayAccess(node: AST.ArrayAccessAST) {
-    const array = (this.currentScope.resolve(node.array.name, VariableSymbol)!
-      .type as unknown) as {
-      componentType: typeof Types.GLODataType;
-    };
-
-    for (let i = 0; i < node.accessors.length; i++) {
-      const accessor = node.accessors[i];
-
-      assertTypeEquality({
-        node: accessor,
-        left: Types.GLOInteger,
-        right: this.visit(accessor),
-        message: `Περίμενα τον δείκτη του πίνακα '${node.array.name}' να είναι τύπου LEFT_TYPE αλλά έλαβα μη συμβατό τύπο RIGHT_TYPE`,
-        allowPromoteLeft: false,
-      });
-    }
-
-    return array.componentType;
-  }
-
   public visitFunctionDeclaration(node: AST.FunctionDeclarationAST) {
-    this.currentScope = this.currentScope.children.get(node.name.name)!;
-
-    this.throwOnIOVisit = true;
-    this.throwOnIOVisitErrorMessageSuffix = 'μέσα σε συνάρτηση';
-    this.visitMultiple(node.constantDeclarations);
-    this.visitMultiple(node.variableDeclarations);
-    this.visitMultiple(node.statementList);
-    this.throwOnIOVisit = false;
-    this.throwOnIOVisitErrorMessageSuffix = '';
-
-    this.currentScope = this.currentScope.getParent()!;
-    return Types.GLOVoid;
-  }
-
-  public visitRead(node: AST.ReadAST) {
-    if (this.throwOnIOVisit) {
-      throw new GLOError(
-        node,
-        `Απαγορεύεται εντολή Διάβασε ${this.throwOnIOVisitErrorMessageSuffix}`,
-      );
-    }
-
-    node.args.forEach((arg) => {
-      const argType = this.visit(arg);
-      if (!Types.canBeRead(argType)) {
-        throw new GLOError(
-          arg,
-          `Δεν μπορώ να διαβάσω μεταβλητή με τύπο ${Types.printType(argType)}`,
-        );
-      }
+    this.withLocalScope(node.name.name, SymbolScopeType.Function, () => {
+      this.visitMultiple(node.children);
     });
-
-    return Types.GLOVoid;
-  }
-
-  public visitWrite(node: AST.WriteAST) {
-    if (this.throwOnIOVisit) {
-      throw new GLOError(
-        node,
-        `Απαγορεύεται εντολή Γράψε ${this.throwOnIOVisitErrorMessageSuffix}`,
-      );
-    }
-
-    node.args.forEach((arg) => {
-      const argType = this.visit(arg);
-      if (!Types.canBeWritten(argType)) {
-        throw new GLOError(
-          arg,
-          `Δεν μπορώ να γράψω μεταβλητή με τύπο ${Types.printType(argType)}`,
-        );
-      }
-    });
-
-    return Types.GLOVoid;
+    return null;
   }
 
   public defaultVisit(node: AST.AST) {
-    node.children.forEach(this.visit.bind(this));
-    return Types.GLOVoid;
+    this.visitMultiple(node.children);
+    return null;
   }
 
   public run() {
