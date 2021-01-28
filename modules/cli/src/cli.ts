@@ -179,7 +179,7 @@ class Psi extends Command {
         write: (...data: string[]) => Promise.resolve(console.log(...data)),
       });
     } catch (error) {
-      if (error instanceof Error) {
+      if (!(error instanceof GLOError)) {
         throw error;
       }
 
