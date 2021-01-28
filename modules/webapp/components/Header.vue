@@ -74,8 +74,8 @@
         :color="!darkmode ? 'black' : 'white'"
       )
     .zoom
-      FontAwesomeIcon(icon="search-plus" @click="increaseFontSize" :class="darkmode ? 'darkmode' : ''")
-      FontAwesomeIcon(icon="search-minus" @click="reduceFontSize" :class="darkmode ? 'darkmode' : ''")
+      FontAwesomeIcon(icon="search-plus" @click="increaseFontSize" :class="darkmode ? 'darkmode' : ''" fixed-width)
+      FontAwesomeIcon(icon="search-minus" @click="reduceFontSize" :class="darkmode ? 'darkmode' : ''" fixed-width)
     Prompt(
       v-if="showInputFile"
       title="Αρχείο εισόδου"
