@@ -67,6 +67,7 @@
         @clickGlossa="openGlossa"
         @clickPseudoglossa="openPseudoglossa"
         @clickFlash="openFlash"
+        @clickFileUpload="openFileUpload"
       )
       ButtonSecondary.fullscreen(
         @click.native="toggleFullscreen"
@@ -76,6 +77,7 @@
     .zoom
       FontAwesomeIcon(icon="search-plus" @click="increaseFontSize" :class="darkmode ? 'darkmode' : ''" fixed-width)
       FontAwesomeIcon(icon="search-minus" @click="reduceFontSize" :class="darkmode ? 'darkmode' : ''" fixed-width)
+    input.file-upload(ref="fileUpload" type="file" @change="onFileUpload")
     Prompt(
       v-if="showInputFile"
       title="Αρχείο εισόδου"
@@ -159,6 +161,9 @@
     .buttons
       > *
         margin-right 0
+
+.file-upload
+  display none
 </style>
 
 <script lang="ts">
@@ -274,11 +279,21 @@ export default class Header extends Vue {
     window.location.href = 'http://pseudo.gloglossa.gr'
   }
 
+  openFileUpload() {
+    (this.$refs.fileUpload as HTMLInputElement).click();
+  }
+
+  async onFileUpload(e: any) {
+    const file = e.target.files[0];
+
+    this.$emit('changeSourceCode', await file.text())
+  }
+
   img(filename: string) {
     return require(`../assets/img/${filename}`)
   }
 
-  dropdownMenu = [ ['Αποθήκευση', 'Download'], ['Animate', 'Animate'], ['Πληροφορίες', 'Information'] ];
+  dropdownMenu = [ ['Άνοιγμα', 'FileUpload'], ['Αποθήκευση', 'Download'], ['Animate', 'Animate'], ['Πληροφορίες', 'Information'] ];
 
   mounted() {
     if(this.isPseudoglossa) this.dropdownMenu.push(['Flash', 'Flash'])

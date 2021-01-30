@@ -20,6 +20,7 @@
       @reduceFontSize="reduceFontSize"
       @increaseFontSize="increaseFontSize"
       @download="download"
+      @changeSourceCode="a => sourceCode = a"
     )
     codemirror.editor(
       ref="editor"
