@@ -1,6 +1,6 @@
 {
   "name": "@glossa-glo/library-glossa",
-  "version": "5.0.1-beta",
+  "version": "5.0.7-beta",
   "description": "GLO Glossa library",
   "author": "komninoschat <komninoschat@gmail.com>",
   "homepage": "https://github.com/komninoschat/glo#readme",
@@ -39,9 +39,9 @@
     "nyc": "^14.1.1"
   },
   "dependencies": {
-    "@glossa-glo/data-types": "^5.0.1-beta",
+    "@glossa-glo/data-types": "^5.0.7-beta",
     "@glossa-glo/error": "^4.2.7-beta",
-    "@glossa-glo/library": "^5.0.1-beta",
-    "@glossa-glo/symbol": "^5.0.1-beta"
+    "@glossa-glo/library": "^5.0.7-beta",
+    "@glossa-glo/symbol": "^5.0.7-beta"
   }
 }

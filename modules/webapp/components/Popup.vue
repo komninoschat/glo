@@ -3,7 +3,7 @@
     .popup(:class="darkmode ? 'darkmode' : ''")
       .popup-body-wrapper
         .popup-body(v-click-outside="close")
-          FontAwesomeIcon.close(icon="times" @click="close")
+          FontAwesomeIcon.close(icon="times" @click="close" fixed-width)
           .title(v-if="title") {{ title }}
           slot
     div(class="portalBugFix")
