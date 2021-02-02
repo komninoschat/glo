@@ -1,6 +1,6 @@
 {
   "name": "@glossa-glo/lexer",
-  "version": "5.0.1-beta",
+  "version": "5.0.7-beta",
   "description": "GLO lexer",
   "author": "komninoschat <komninoschat@gmail.com>",
   "homepage": "https://github.com/komninoschat/glo#readme",
@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@glossa-glo/case-insensitive-map": "^4.2.7-beta",
-    "@glossa-glo/data-types": "^5.0.1-beta",
+    "@glossa-glo/data-types": "^5.0.7-beta",
     "@glossa-glo/error": "^4.2.7-beta",
     "typescript": "^4.1.3"
   },
