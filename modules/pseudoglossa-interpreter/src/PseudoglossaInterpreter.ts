@@ -768,6 +768,8 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
   }
 
   public async visitRepeat(node: AST.RepeatAST) {
+    await this.visitMultipleInOrder(node.statementList);
+
     const conditionType = await this.visit(node.condition);
     assertEquality(
       node.condition,
@@ -780,9 +782,9 @@ export class PseudoglossaInterpreter extends AST.PseudoglossaAsyncASTVisitorWith
       )}`,
     );
 
-    do {
+    while ((await this.visit(node.condition)).equals(Types.GLOBoolean.false)) {
       await this.visitMultipleInOrder(node.statementList);
-    } while ((await this.visit(node.condition)).equals(Types.GLOBoolean.false));
+    }
     return new Types.GLOVoid();
   }
 

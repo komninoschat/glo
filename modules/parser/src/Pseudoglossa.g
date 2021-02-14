@@ -3,7 +3,7 @@ nl
   ;
 
 repeat_loop
-  : "ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ" nl statement_list "ΜΕΧΡΙΣ_ΟΤΟΥ" expression
+  : "ΕΠΑΝΑΛΑΒΕ" nl statement_list "ΜΕΧΡΙΣ_ΟΤΟΥ" expression
 
 while_loop
   : "ΟΣΟ" expression "ΕΠΑΝΑΛΑΒΕ" nl statement_list "ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ"

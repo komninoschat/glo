@@ -28,7 +28,7 @@ export class Lexer {
     ['ΜΕΧΡΙ', () => new Token.ToToken()],
     ['ΕΠΑΝΑΛΑΒΕ', () => new Token.DoToken()],
     ['ΟΣΟ', () => new Token.WhileToken()],
-    ['ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ', () => new Token.RepeatToken()],
+
     ['ΜΕΧΡΙΣ_ΟΤΟΥ', () => new Token.UntilToken()],
     ['ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ', () => new Token.LoopEndToken()],
     ['ΜΕ_ΒΗΜΑ', () => new Token.WithStepToken()],
@@ -64,6 +64,7 @@ export class Lexer {
     ['ΛΟΓΙΚΗ', () => new Token.BooleanSingularToken()],
     ['ΧΑΡΑΚΤΗΡΑΣ', () => new Token.StringSingularToken()],
     ['ΚΑΛΕΣΕ', () => new Token.CallToken()],
+    ['ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ', () => new Token.RepeatToken()],
   ]);
 
   public static readonly pseudoglossaReservedKeywords = new CaseInsensitiveMap<

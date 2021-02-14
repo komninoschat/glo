@@ -66,11 +66,15 @@ export class Parser {
     return new AST.EmptyAST();
   }
 
-  private repeatLoop() {
+  private repeatLoop(token: typeof Lexer.RepeatToken | typeof Lexer.DoToken) {
     const repeatToken = Object.assign({}, this.currentToken);
-    this.currentToken = this.eat(Lexer.RepeatToken);
+    this.currentToken = this.eat(token);
 
-    this.nl('Περίμενα νέα γραμμή μετά από ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ');
+    this.nl(
+      `Περίμενα νέα γραμμή μετά από ${
+        token instanceof Lexer.RepeatToken ? 'ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ' : 'ΕΠΑΝΑΛΑΒΕ'
+      }`,
+    );
 
     const statementList = this.statementList();
 
@@ -1279,7 +1283,12 @@ export class Parser {
     } else if (this.currentToken instanceof Lexer.WhileToken) {
       return this.whileLoop();
     } else if (this.currentToken instanceof Lexer.RepeatToken) {
-      return this.repeatLoop();
+      return this.repeatLoop(Lexer.RepeatToken);
+    } else if (
+      this.currentToken instanceof Lexer.DoToken &&
+      this.lexer.mode === Lexer.Mode.Pseudoglossa
+    ) {
+      return this.repeatLoop(Lexer.DoToken);
     } else if (this.currentToken instanceof Lexer.WriteToken) {
       return this.writeStatement(Lexer.WriteToken);
     } else if (this.currentToken instanceof Lexer.PrintToken) {
