@@ -21,7 +21,7 @@ function toUpperCaseNormalizedGreek(s) {
     .replace(/Ώ/g, 'Ω');
 }
 
-CodeMirror.defineMode('pseudoglossa', function() {
+CodeMirror.defineMode('pseudoglossa', function () {
   function words(str) {
     const obj = {},
       words = str.split(' ');
@@ -31,7 +31,7 @@ CodeMirror.defineMode('pseudoglossa', function() {
   const keywords = words(
     'DIV ΑΛΓΟΡΙΘΜΟΣ ΤΕΛΟΣ ΕΚΤΥΠΩΣΕ ΕΜΦΑΝΙΣΕ ΑΝΤΙΜΕΤΑΘΕΣΕ ' +
       'ΑΛΗΘΗΣ ΨΕΥΔΗΣ ΑΝ ΤΟΤΕ ΑΛΛΙΩΣ ΚΑΙ Η ΟΧΙ ' +
-      'ΓΙΑ ΤΟ ΑΠΟ ΜΕΧΡΙ ΕΠΑΝΑΛΑΒΕ ΟΣΟ ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ ΜΕΧΡΙΣ_ΟΤΟΥ ' +
+      'ΓΙΑ ΤΟ ΑΠΟ ΜΕΧΡΙ ΕΠΑΝΑΛΑΒΕ ΟΣΟ ΜΕΧΡΙΣ_ΟΤΟΥ ' +
       'ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ ΜΕ_ΒΗΜΑ ΔΕΔΟΜΕΝΑ ΑΠΟΤΕΛΕΣΜΑΤΑ ' +
       'ΔΙΑΒΑΣΕ ΓΡΑΨΕ ΑΛΛΙΩΣ_ΑΝ ΤΕΛΟΣ_ΑΝ ' +
       'ΕΠΙΛΕΞΕ ΠΕΡΙΠΤΩΣΗ ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ MOD ',
@@ -72,7 +72,7 @@ CodeMirror.defineMode('pseudoglossa', function() {
   }
 
   function tokenString(quote) {
-    return function(stream, state) {
+    return function (stream, state) {
       let next,
         end = false;
       while ((next = stream.next()) != null) {
@@ -100,11 +100,11 @@ CodeMirror.defineMode('pseudoglossa', function() {
   // Interface
 
   return {
-    startState: function() {
+    startState: function () {
       return { tokenize: null };
     },
 
-    token: function(stream, state) {
+    token: function (stream, state) {
       if (stream.eatSpace()) return null;
       const style = (state.tokenize || tokenBase)(stream, state);
       if (style == 'comment' || style == 'meta') return style;

@@ -54,7 +54,7 @@
         div.read-console(
           v-else-if="c.type === 'read'"
         )
-          .label {{ c.label }}
+          .label(v-if="c.label") {{ c.label }}
           .reading {{ c.message }}
         div.error-console(
           v-else-if="c.type === 'error'"
