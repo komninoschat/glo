@@ -117,6 +117,14 @@
     "@glossa-glo/error" "^4.2.0-beta"
     typescript "3.9"
 
+"@glossa-glo/data-types@^5.0.7-beta":
+  version "5.0.7-beta"
+  resolved "https://registry.yarnpkg.com/@glossa-glo/data-types/-/data-types-5.0.7-beta.tgz#d0fa6355a0f6260701e9d61f5073c2b9293f3d9d"
+  integrity sha512-NOg9ORK6zIo8w2fNdcf/ae+1hrevWcSLVdNS28xp+To6cU5iwXwG+dCZOLTBdNaeq8o2NqGAvv9u8LAFwcErsQ==
+  dependencies:
+    "@glossa-glo/error" "^4.2.7-beta"
+    typescript "^4.1.3"
+
 "@glossa-glo/error@^4.2.0-beta":
   version "4.2.0-beta"
   resolved "https://registry.yarnpkg.com/@glossa-glo/error/-/error-4.2.0-beta.tgz#ecf225aaab5718bdd92064d35c10e8530fc680ed"
@@ -124,6 +132,14 @@
   dependencies:
     deep-equal "^2.0.3"
     typescript "3.9"
+
+"@glossa-glo/error@^4.2.7-beta":
+  version "4.2.7-beta"
+  resolved "https://registry.yarnpkg.com/@glossa-glo/error/-/error-4.2.7-beta.tgz#d5b5be19315a61aa3d759be0c27bdbe6c9cab09d"
+  integrity sha512-lq/ivONmboyvkOPYgb18fkPg/SGlF0FIc+J7DHWv+pc4LyDlluRVwXETfiojOemGUYBa+dHm0igooxjfs6wE1g==
+  dependencies:
+    deep-equal "^2.0.3"
+    typescript "^4.1.3"
 
 "@glossa-glo/symbol@^4.2.0-beta":
   version "4.2.0-beta"
@@ -896,9 +912,9 @@ lodash.flattendeep@^4.4.0:
   integrity sha1-+wMJF/hqMTTlvJvsDWngAT3f7bI=
 
 lodash@^4.17.15, lodash@^4.17.19:
-  version "4.17.20"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
-  integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
+  version "4.17.21"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
+  integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
 
 log-symbols@2.2.0:
   version "2.2.0"
